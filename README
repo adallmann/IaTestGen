@@ -1,0 +1,4 @@
+IaTestGen - Interval arithmetic test generator
+==============================================
+
+A test generator for libraries of the preliminary IEEE P1788 standard for interval arithmetic
