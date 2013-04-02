@@ -101,7 +101,7 @@ public class CommandLineInterpreter {
 	private static final String LANGUAGE_SPECIFICATION = "Generate unit-tests for all available libraries in ";
 
 	// name of program/jar-file
-	private static final String CLASS = "ia_gen";
+	private static final String CLASS = "ia_gen.jar";
 
 	private static final String SEPERATOR = StringUtils.repeat("*", 74);
 	private static final DecimalFormat INDEX = new DecimalFormat("00");
@@ -210,7 +210,22 @@ public class CommandLineInterpreter {
 		/*-------------------PARSE USER INPUT--------------------- */
 		/*-------------------------------------------------------- */
 		try {
+			// manual search for help-arguments
+ 			for (String arg: args) {
+				arg = arg.trim().replace("-", "");
+ 				if (arg.equals(HELP_OPTION_SHORT) || arg.equals(HELP_OPTION)) {
+					printHelp(options_short);
+					return;
+				}
+ 				if (arg.equals(HELP2_OPTION_SHORT) || arg.equals(HELP2_OPTION)) {
+					printExtendedHelp(options);
+					return;
+				}
+ 			}
+			
+			// parse arguments	
 			line = parser.parse(options, args);
+
 			File dsl_file = null;
 			File output_folder = null;
 			File optional_config = null;
@@ -221,7 +236,6 @@ public class CommandLineInterpreter {
 
 			// if help-option found print help
 			if (line.hasOption(HELP2_OPTION_SHORT) || args.length == 0) {
-				System.out.println("\n");
 				printExtendedHelp(options);
 				return;
 			}
@@ -378,9 +392,9 @@ public class CommandLineInterpreter {
 			}
 
 		} catch (ParseException | IOException p) {
-			System.err.println("\n" + SEPERATOR + "\n" + "ERROR - WRONG ARGUMENTS:\n" + p.getMessage() + "\n" + SEPERATOR + "\n");
-			printHelp(options_short);
-			System.out.println("\n");
+				System.err.println("\n" + SEPERATOR + "\n" + "ERROR - WRONG ARGUMENTS:\n" + p.getMessage() + "\n" + SEPERATOR + "\n");
+				printHelp(options_short);
+				System.out.println("\n");
 		}
 	}
 }
