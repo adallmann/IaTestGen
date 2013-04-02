@@ -28,8 +28,8 @@ package de.uniwue.info2.operations;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uniwue.info2.miscellaneous.ClassDiscovery;
-import de.uniwue.info2.numerics.FloatingPoint;
+import de.uniwue.info2.numerics.prec.DoublePrecisionFloat;
+import de.uniwue.info2.numerics.prec.SinglePrecisionFloat;
 
 /**
  * This class implements the interval-datatype.
@@ -190,10 +190,14 @@ public class Interval<T> {
 		for (Class<?> cl : basic_types) {
 			accepted_types.add(cl);
 		}
+
+
+		// TODO:
 		// add float types
-		for (Class<? extends FloatingPoint> cl : ClassDiscovery.findInSubpackages(FloatingPoint.class)) {
-			accepted_types.add(cl);
-		}
+		// same package as FloatingPoint.class
+		accepted_types.add(SinglePrecisionFloat.class);
+		accepted_types.add(DoublePrecisionFloat.class);
+
 		return accepted_types;
 	}
 

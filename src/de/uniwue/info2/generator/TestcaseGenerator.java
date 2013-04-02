@@ -164,7 +164,8 @@ public class TestcaseGenerator {
 	 *         if true, optional operations are also generated
 	 * @return true if unit-tests were successfully generated
 	 */
-	public boolean generateUnitTest(LanguageSpecification targetLanguage, Boolean useOptionalOperations, Boolean littleEndian) {
+	public boolean generateUnitTest(LanguageSpecification targetLanguage, Boolean useOptionalOperations, List<String> optionalExceptions,
+			Boolean littleEndian) {
 		// log operations which are not supported by current language
 		// specification
 		StringBuffer log;
@@ -249,9 +250,21 @@ public class TestcaseGenerator {
 					// testing if operation is implemented
 					if ((this.currentOperationsTranslationTable_.containsKey(operation.getName()) && !mixed_types)
 							|| (this.currentMixedTypesOperationsTranslationTable_.containsKey(operation.getName()) && mixed_types)) {
-						// checks if only required operations are going to be
-						// generated
-						if (operation.isRequired() || useOptionalOperations) {
+
+						// check if recommended operations are marked for generation
+						// elaboate if block for more clarity 
+						boolean generateCurrentOp=false;
+						if (operation.isRequired()) {
+							generateCurrentOp=true;
+						}
+						else if (useOptionalOperations && !optionalExceptions.contains(operation.getName())) {
+							generateCurrentOp=true;
+						}
+						else if (!useOptionalOperations && optionalExceptions.contains(operation.getName())) {
+							generateCurrentOp=true;
+						}
+
+						if (generateCurrentOp) {
 
 							// get raw test-method from unit-test-library
 							testMethods += uSpec.getTestMethod();
