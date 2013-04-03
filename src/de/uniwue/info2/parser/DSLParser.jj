@@ -1,0 +1,977 @@
+/*
+ *    Copyright 2013
+ *    Marco Nehmeier (nehmeier@informatik.uni-wuerzburg.de)
+ *    Institute of Computer Science,
+ *    University of Wuerzburg, Germany
+ *    
+ *    Michael Jedich (m.jedich@gmail.com)
+ *    University of Wuerzburg, Germany
+ *    
+ *    
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *    
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *    
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+
+
+/* --------------------------------------------------------- */
+/* ----------------------JAVACC-OPTIONS--------------------- */
+/* --------------------------------------------------------- */
+options
+{
+  STATIC = false;
+  IGNORE_CASE = true;
+}
+
+
+/* --------------------------------------------------------- */
+/* -----------------------PARSER-CLASS---------------------- */
+/* --------------------------------------------------------- */
+PARSER_BEGIN(DSLParser)
+package de.uniwue.info2.parser;
+import de.uniwue.info2.numerics.FloatingPoint;
+import de.uniwue.info2.numerics.prec.DoublePrecisionFloat;
+import de.uniwue.info2.numerics.prec.SinglePrecisionFloat;
+import de.uniwue.info2.operations.GenericParameter;
+import de.uniwue.info2.operations.Interval;
+import de.uniwue.info2.operations.Operation;
+import de.uniwue.info2.generator.OperationsPool;
+import de.uniwue.info2.operations.Endpoints;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.HashMap;
+
+
+/**
+ * Parser for the Domain Specific Language.
+ * 
+ * @author Michael Jedich
+ */
+
+@SuppressWarnings("unused")
+public class DSLParser
+{
+  // dsl information, updated by the dsl
+  private static String dslAuthors, dslVersion, dslDescription;
+  
+
+  // information for generated parser
+  // if parser has been modified, update this information:
+  private final static String parserDescription = 
+  		"Early Version of Parser Generator";
+  private final static String parserVersion = "0.8";
+  private final static String parserAuthors = "Michael Jedich";
+  
+  // variables specified in the dsl
+  private HashMap<String, GenericParameter<?>> variables_;
+  
+  // operations specified in the dsl
+  private OperationsPool operations_;
+  
+  // current operation found in the dsl
+  private Operation currentOperation_;
+  private String currentOperationDescription_ = null;
+  private boolean currentOperationRequired_ = true;
+  private boolean currentOperationInputMode_ = true;
+
+
+  // used for an exception message when handling variables
+  private String lastUsedVariableName_;
+  private int lastUsedVariableLineNumber_;
+  private int lastUsedVariableColumnNumber_;
+
+  /**
+   * DSL-Parser constructor.
+   * 
+   * @param dslFile
+   *            given Domain Specific Language - File
+   * @throws FileNotFoundException
+   */
+  public DSLParser(File dslFile) throws FileNotFoundException
+  {
+    this (new FileReader(dslFile));
+    this.operations_ = new OperationsPool();
+    variables_ = new HashMap<String, GenericParameter<?>>();
+  }
+
+  /**
+   * Get authors specified in the Domain Specific Language.
+   * 
+   * @return DSL authors in single String
+   */
+  public String getDslAuthors()
+  {
+    return dslAuthors;
+  }
+
+  /**
+   * Get version of Domain Specific Language.
+   * 
+   * @return DSL version as String
+   */
+  public String getDslVersion()
+  {
+    return dslVersion;
+  }
+
+  /**
+   * Get description of Domain Specific Language.
+   * 
+   * @return DSL description
+   */
+  public String getDslDescription()
+  {
+    return dslDescription;
+  }
+
+  /**
+   * Get description of current parser.
+   * 
+   * @return Parser description
+   */
+  public static String getParserDescription()
+  {
+    return parserDescription;
+  }
+
+  /**
+   * Get version of current parser.
+   * 
+   * @return Parser version
+   */
+  public static String getParserVersion()
+  {
+    return parserVersion;
+  }
+
+  /**
+   * Get authors of current parser.
+   * 
+   * @return Parser authors in single String.
+   */
+  public static String getParserAuthors()
+  {
+    return parserAuthors;
+  }
+}
+
+PARSER_END(DSLParser)
+
+// custom method to normalize comment tags (removes whitespaces, line breaks, tabs)
+TOKEN_MGR_DECLS :
+{
+  public static String normalizeCommentTag(String tag)
+  {
+    return tag.replaceAll("[*\t]", "").replace("  ", " ").replace("\n ", "\n").trim();
+  }
+}
+
+/* --------------------------------------------------------- */
+/* -------------------TOKEN-SPECIFICATION------------------- */
+/* --------------------------------------------------------- */
+
+
+
+< DEFAULT > SKIP :
+{
+	// skip whitespaces, tabs and line breaks
+	" " | "\t" | "\n" 
+	
+	// simple line comment  
+	| < "//" (~[ "\n" ])* "\n" >
+	
+	// variables
+	| "$" : VARIABLE
+}
+
+/* ----------------------Block-Comments--------------------- */
+< DEFAULT > TOKEN :
+{
+	// block comments
+	< BEGIN_BLOCK_COMMENT : "/*" > : BLOCK_COMMENT 
+}
+
+
+< BLOCK_COMMENT > SKIP :
+{
+	< ~[ ] > | "*/" : DEFAULT
+}
+
+< BLOCK_COMMENT > TOKEN :
+{
+	  < AUTHOR_TAG : 			"@author" 			> 		: TAG_CONTENT
+	| < VERSION_TAG : 		"@version" 			> 		: TAG_CONTENT
+	| < DESCRIPTION_TAG : "@description" 	> 		: TAG_CONTENT
+	| < OPTIONAL_TAG :		"@required" 		>		 	: TAG_CONTENT
+}
+
+< TAG_CONTENT > SKIP :
+{
+	";" : BLOCK_COMMENT
+}
+
+< TAG_CONTENT > TOKEN :
+{
+	< TAG : ((~["@", ";"])+) > 
+	{
+	 matchedToken.image = normalizeCommentTag(image.toString());
+	}
+}
+
+/* -------------------------Variables----------------------- */
+< VARIABLE > SKIP :
+{
+	" " | "\t" | "\n"
+}
+
+< VARIABLE > TOKEN :
+{
+    < VARIABLE_NAME : 	((["0" - "9", "a"-"z", "_", "-"])+) > : DEFAULT
+}
+
+
+/* -----------------------Data types------------------------ */
+
+<DEFAULT> TOKEN :
+{
+	// integer types
+	< SHORT : ("short") >
+	| < INTEGER : ("int") >
+	| < LONG : ("long") >
+	
+	| < DIGITS_INTEGER :
+    	("-")?(["0"-"9"])+ >
+
+
+	// floating point types
+	| < FLOAT : ("float") >
+	| < DOUBLE : ("double") >
+	
+	// value of a flaoting point parameter
+	| < DIGITS_FLOAT :
+	    ("-")?((([ "0"-"9" ])+ "." ([ "0"-"9" ])*) 
+	    | (([ "0"-"9" ])* "." ([ "0"-"9" ])+)) (("e")("+" | "-")? 
+	    ([ "1"-"9" ])+)?("d" | "f")? >
+	
+	// binary
+	| < BIN_32 :
+    	("0b")?([ "0", "1" ]){32} >
+	| < BIN_64 :
+    	("0b")?([ "0", "1" ]){64} >
+    	
+    // hexadecimal
+    | < HEX_8 :
+    	("0x")?([ "0"-"9", "a"-"f"]){8}>
+    | < HEX_16 :
+    	("0x")?([ "0"-"9", "a"-"f" ]){16}>
+    	
+	// boolean type
+	| < BOOL : ("bool") >
+	| < BOOL_TRUE : ("true") >
+	| < BOOL_FALSE : ("false") >
+	
+	// interval string
+	| < INTERVAL : "interval" >
+	
+	| < NEGATIVE_INFINITY : "-inf" >
+	| < POSITIVE_INFINITY : "+inf" >
+	
+	| < EMPTY_SET : "empty" >
+	
+	// end of line
+	| < EOL : ";" >
+}
+
+
+/* --------------------------------------------------------- */
+/* ------------------GRAMMER-SPECIFICATION------------------ */
+/* --------------------------------------------------------- */
+
+// main grammer
+
+OperationsPool parse() :
+{}
+{
+	(
+		// at first the dsl should contain one block-comment
+		// in header with some dsl-information
+		dslHeaderBlockComment()
+		(
+			// optional information of next operation
+			operationBlockComment()
+		|
+			// variable definition
+			variable()
+		|
+			// operation definition
+			operation()
+		)*
+		
+		// end of dsl-file
+		< EOF >
+	)
+	{
+		// return extracted operations of given Domain-Specific-Language
+		return operations_;
+	}
+}
+
+
+/* ----------------Define operations here:------------------ */
+
+void operation() :
+{
+  Token operation;
+  this.currentOperation_ = new Operation();
+  this.currentOperation_.setDescription(this.currentOperationDescription_);
+  this.currentOperation_.setRequired(this.currentOperationRequired_);
+  this.currentOperationInputMode_ = true;
+}
+{
+  (
+  	operation = "pos" 						"(" interval() ")" 
+		switchToOutput() 							"="	interval()
+  |
+  	operation = "neg" 						"(" interval() ")" 
+		switchToOutput() 							"="	interval()
+  |
+  	operation = "add"							"(" interval() "," interval() ")" 	
+		switchToOutput() 							"=" interval()
+  |
+  	operation = "sub" 						"(" interval() "," interval() ")" 	
+		switchToOutput() 							"=" interval()
+  |
+  	operation = "mul" 						"(" interval() "," interval() ")" 	
+		switchToOutput() 							"=" interval()
+  |
+  	operation = "div" 						"(" interval() "," interval() ")" 	
+		switchToOutput() 							"=" interval()
+  |
+  	operation = "inv" 						"(" interval() ")" 	
+		switchToOutput() 							"=" interval()
+  |
+  	operation = "sqrt"		 				"(" interval() ")" 	
+		switchToOutput() 							"=" interval()
+  |
+  	operation = "fma"							"(" interval() "," interval() "," interval()")" 	
+		switchToOutput() 							"=" interval()
+  |
+  	operation = "interval_case" 	"(" interval() "," interval() "," interval()")" 	
+		switchToOutput() 							"=" interval()
+  |
+
+
+
+  	operation = "median"  			"(" interval() ")" 					switchToOutput() "=" 	number()
+  |
+  	operation = "is_in"	  			"(" number() "," interval() ")" 	switchToOutput() "=" 	bool()
+  |
+  	operation = "bisect"  			"(" interval() ")"					switchToOutput() "=" 	interval() "," interval()
+  )
+  
+  < EOL >
+  {
+    this.operations_.addOperation(operation.image, this.currentOperation_);
+    this.currentOperationDescription_ = null;
+    this.currentOperationRequired_ = true;
+  }
+}
+
+
+void switchToOutput() :
+{}
+{
+ { this.currentOperationInputMode_ = false; }
+}
+
+
+
+/* ----------------Block comments handling------------------ */
+
+void dslHeaderBlockComment() :
+{}
+{
+  (
+	< BEGIN_BLOCK_COMMENT > ( commentTag(false) )*
+  )
+}
+
+void operationBlockComment() :
+{}
+{
+  (
+  	< BEGIN_BLOCK_COMMENT > ( commentTag(true) )*
+  )
+}
+
+void commentTag(boolean operation) :
+{
+  Token t;
+}
+{
+  (
+    < AUTHOR_TAG > t = < TAG >
+      {
+      	if (!operation) {
+	         dslAuthors = t.image;
+        }
+      }
+  )
+|
+  (
+    < VERSION_TAG > t = < TAG >
+      {
+      	if (!operation) {
+	        dslVersion = t.image;
+        }
+      }
+  )
+|
+  (
+    < DESCRIPTION_TAG > t = < TAG >
+      {
+      	if (!operation) {
+	         dslDescription = t.image;
+        }
+        else {
+        	currentOperationDescription_ = t.image;
+        }
+      }
+  )
+|
+  (
+    < OPTIONAL_TAG > t = < TAG >
+	{
+		if (operation) {
+			if (t.image.toLowerCase().equals("true")) {
+		    	currentOperationRequired_ = true;
+			}
+			else if (t.image.toLowerCase().equals("false")){
+				currentOperationRequired_ = false;
+		  }
+		}
+	}
+  )
+}
+
+
+/* ---------------------Handle variables-------------------- */
+
+// add new variable with its value
+void variable() :
+{
+	Token name;
+	GenericParameter <?> par;
+}
+{
+	name = <VARIABLE_NAME> "=" par = getParameter() < EOL >
+	{
+		variables_.put(name.image, par);
+	}
+}
+
+// get variable-value by its name
+GenericParameter <?> getVariableValue() :
+{
+	Token variable;
+}
+{
+	variable = <VARIABLE_NAME>
+	{
+		lastUsedVariableName_ = variable.image;
+		lastUsedVariableLineNumber_ = variable.beginLine;
+		lastUsedVariableColumnNumber_ = variable.beginColumn;
+		
+		if (variables_.containsKey(lastUsedVariableName_)) {
+			return variables_.get(lastUsedVariableName_);
+		}
+		else {
+			throw new NullPointerException
+				("\n" + "Variable: \"$" + lastUsedVariableName_ 
+				+ "\" from line: " + lastUsedVariableLineNumber_ 
+				+ ", column: " 
+				+ lastUsedVariableColumnNumber_ + " is NULL!\n");
+		}
+ 	}
+}
+
+String getFalseTypeExceptionMessage(String requiredTypeName, 
+	String actualTypeName, boolean interval) :
+{}
+{
+	{
+	String exception = "\n" + "Variable: \"$" + lastUsedVariableName_ 
+			+ "\" in line: " + lastUsedVariableLineNumber_ + ", column: " 
+			+ lastUsedVariableColumnNumber_ + " has a unexpected/false type";
+	if (interval) {
+		exception += " with current interval ";
+	}
+	exception += "\n" + "Required type: \t" +
+			requiredTypeName + "\n" + "Actual type: \t" 
+			+ actualTypeName + "\n";
+	
+	return exception;
+	}
+}
+
+/* ---------------Handle primitive data type---------------- */
+GenericParameter <?> getParameter() :
+{
+	Short shortParam = null;
+	Integer integerParam = null;
+	Long longParam = null;
+	SinglePrecisionFloat floatParam = null;
+	DoublePrecisionFloat doubleParam = null;
+	Boolean boolParam = null;
+	Interval<?> intervalParam = null;
+
+	Endpoints infinityParam = null;
+	Endpoints emptySetParam = null;
+}
+{
+	< SHORT > ":" shortParam = getShortValue()
+	{ return new GenericParameter<Short>(shortParam); }
+	
+	|< INTEGER > ":" integerParam = getIntegerValue()
+	{ return new GenericParameter<Integer>(integerParam); }
+	
+	|< LONG > ":" longParam = getLongValue()
+	{ return new GenericParameter<Long>(longParam); }
+	
+	|< FLOAT > ":" floatParam = getSinglePrecisionFloatValue()
+	{ return new GenericParameter<SinglePrecisionFloat>(floatParam); }
+	
+	|< DOUBLE > ":" doubleParam = getDoublePrecisionFloatValue()
+	{ return new GenericParameter<DoublePrecisionFloat>(doubleParam); }
+	
+	|(< BOOL > ":")? boolParam = getBoolValue()
+	{ return new GenericParameter<Boolean>(boolParam); }
+	
+	| intervalParam = getIntervalParameter()
+	{ return new GenericParameter<Interval<?>>(intervalParam); }
+	
+	| infinityParam = getInfinityValue()
+	{ return new GenericParameter<Endpoints>(infinityParam); }
+}
+
+
+Endpoints getInfinityValue() :
+{}
+{
+	< NEGATIVE_INFINITY > 
+	{ return Endpoints.NEGATIVE_INFINITY; }
+	| < POSITIVE_INFINITY >
+	{ return Endpoints.POSITIVE_INFINITY; }
+}
+
+
+Boolean getBoolValue() :
+{}
+{
+	< BOOL_TRUE > { return true; } | < BOOL_FALSE > { return true; }
+}
+
+
+DoublePrecisionFloat getDoublePrecisionFloatValue() : 
+{
+	Token value;
+}
+{
+	((value = < HEX_16 >) | (value = < BIN_64 >) | (value = < DIGITS_INTEGER >) | (value = < DIGITS_FLOAT >))
+	{ return new DoublePrecisionFloat(value.image); }
+}
+
+SinglePrecisionFloat getSinglePrecisionFloatValue() : 
+{
+	Token value;
+}
+{
+	((value = < HEX_8 >) | (value = < BIN_32 >) | (value = < DIGITS_INTEGER >) | (value = < DIGITS_FLOAT >))
+	{ return new SinglePrecisionFloat(value.image); }
+}
+
+Short getShortValue() :
+{
+	Token value;
+}
+{
+	value = < DIGITS_INTEGER >
+	{ return Short.valueOf(value.image); }
+}
+
+Integer getIntegerValue() :
+{
+	Token value;
+}
+{
+	value = < DIGITS_INTEGER >
+	{ return Integer.valueOf(value.image); }
+}
+
+Long getLongValue() :
+{
+	Token value;
+}
+{
+	value = < DIGITS_INTEGER >
+	{ return Long.valueOf(value.image); }
+}
+
+
+
+/* ----------Handle paramers given in an operation---------- */
+
+void bool() :
+{
+	GenericParameter <?> variable = null;
+	Boolean bool = null;
+}
+{
+	(
+		bool = getBoolValue()
+		addParameterToFunction(new GenericParameter<Boolean> (bool)))
+	|
+	(
+		variable = getVariableValue()
+		{
+	 		if (variable.hasType(Boolean.class)) { 
+	 			addParameterToFunction(variable);
+	 		}
+	 		else {
+	 			throw new ParseException(
+					getFalseTypeExceptionMessage("Boolean" , 
+					variable.getTypeClass().getSimpleName(), false));
+	 		}
+ 		}
+	)
+}
+
+void number() :
+{
+	GenericParameter <?> variable = null;
+}
+{
+	floatingPoint()
+	|
+	integer()
+	|
+	(
+		variable = getVariableValue()
+		{
+	 		if (variable.hasType(FloatingPoint.class) || variable.hasType(Number.class)) { 
+	 			addParameterToFunction(variable);
+	 		}
+	 		else {
+	 			throw new ParseException(
+					getFalseTypeExceptionMessage("Short, Integer Long, "
+					+ "SinglePrecisionFloat or DoublePrecisionFloat", 
+					variable.getTypeClass().getSimpleName(), false));
+	 		}
+ 		}
+	)
+}
+
+
+void floatingPoint() :
+{
+	FloatingPoint fp;
+}
+{
+	(< FLOAT > ":") fp = getSinglePrecisionFloatValue() 
+	| 
+	(< DOUBLE > ":") fp = getDoublePrecisionFloatValue() 
+	addParameterToFunction(new GenericParameter<FloatingPoint> (fp))
+}
+
+void integer() :
+{
+	Number num = null;
+}
+{
+		(
+		(< SHORT > ":") num = getShortValue()
+		| (< INTEGER > ":") num = getIntegerValue()
+		| (< LONG > ":") num = getLongValue()
+		)
+	 	addParameterToFunction(new GenericParameter<Number> (num))
+}
+
+void interval() :
+{
+	GenericParameter <?> variable = null;
+	Interval<?> interval = null;
+}
+{
+	(
+		interval = getIntervalParameter()
+ 		addParameterToFunction(new GenericParameter<Interval<?>> (interval))
+ 	)
+ 	| 
+ 	variable = getVariableValue()
+ 	{
+ 		if (variable.hasType(Interval.class)) { 
+ 			addParameterToFunction(variable);
+ 		}
+ 		else {
+ 			throw new ParseException(
+				getFalseTypeExceptionMessage(Interval.class.getName(), 
+				variable.getTypeClass().getSimpleName(), false));
+ 		}
+ 	}
+}
+
+void addParameterToFunction(GenericParameter<?> param) :
+{}
+{
+  {
+    if (this.currentOperationInputMode_)
+    {
+      currentOperation_.addInputParameter(param);
+    }
+    else
+    {
+      currentOperation_.addOutputParameter(param);
+    }
+  }
+}
+
+
+/* -----------------Handle interval-type-------------------- */
+Interval<?> getIntervalParameter() :
+{
+	Interval<FloatingPoint> intervalFloat = new Interval<FloatingPoint>(FloatingPoint.class);
+	Interval<Number> intervalInteger = new Interval<Number>(Number.class);
+	
+	FloatingPoint floatValue = null;
+	Number integerValue = null;
+}
+
+{
+
+	(< INTERVAL > "<")
+	(
+	(
+		< FLOAT > ">" 
+		"["
+		{ intervalFloat.specifySubclass(SinglePrecisionFloat.class); }
+		(
+			(  
+			(
+				floatValue = getSinglePrecisionFloatValue() 
+				{ intervalFloat.setLower_limit(floatValue); }
+				| handleEndpointsAndVariablesForFloat(intervalFloat, true)
+			)
+			"," 
+			(
+				floatValue = getSinglePrecisionFloatValue() 
+				{intervalFloat.setUpper_limit(floatValue);}
+				| handleEndpointsAndVariablesForFloat(intervalFloat, false)
+			) 
+			)
+			|
+			< EMPTY_SET >
+			{ intervalFloat.emptyInterval(); }
+		)
+		"]"
+		{ return intervalFloat; }
+	)
+	| 
+	(
+		< DOUBLE > ">" 
+		"["
+		{ intervalFloat.specifySubclass(DoublePrecisionFloat.class); }
+		(
+			(  
+			(
+				floatValue = getDoublePrecisionFloatValue() 
+				{ intervalFloat.setLower_limit(floatValue); }
+				| handleEndpointsAndVariablesForFloat(intervalFloat, true)
+			)
+			"," 
+			(
+				floatValue = getDoublePrecisionFloatValue() 
+				{intervalFloat.setUpper_limit(floatValue);}
+				| handleEndpointsAndVariablesForFloat(intervalFloat, false)
+			)
+			)
+			|
+			< EMPTY_SET >
+			{ intervalFloat.emptyInterval(); }
+		)
+		"]"
+		{ return intervalFloat; }
+	)
+	|
+	(
+		< SHORT > ">" 
+		"["
+		{ intervalInteger.specifySubclass(Short.class); }
+		(
+			(  
+			(
+				integerValue = getShortValue() 
+				{ intervalInteger.setLower_limit(integerValue); }
+				| handleEndpointsAndVariablesForInteger(intervalInteger, true)
+			)
+			"," 
+			(
+				integerValue = getShortValue() 
+				{intervalInteger.setUpper_limit(integerValue);}
+				| handleEndpointsAndVariablesForInteger(intervalInteger, false)
+			)
+			)
+			|
+			< EMPTY_SET >
+			{ intervalFloat.emptyInterval(); }
+		)
+		"]"
+		{ return intervalInteger; }
+	)
+	|
+	(
+		< INTEGER > ">" 
+		"["
+		{ intervalInteger.specifySubclass(Integer.class); }
+		(
+			(  
+			(
+				integerValue = getIntegerValue() 
+				{ intervalInteger.setLower_limit(integerValue); }
+				| handleEndpointsAndVariablesForInteger(intervalInteger, true)
+			)
+			"," 
+			(
+				integerValue = getIntegerValue() 
+				{intervalInteger.setUpper_limit(integerValue);}
+				| handleEndpointsAndVariablesForInteger(intervalInteger, false)
+			)
+			)
+			|
+			< EMPTY_SET >
+			{ intervalFloat.emptyInterval(); }		)
+		"]"
+		{ return intervalInteger; }
+	)
+	|
+	(
+		< LONG > ">" 
+		"["
+		{ intervalInteger.specifySubclass(Long.class); }
+		(
+			(  
+			(
+				integerValue = getLongValue() 
+				{ intervalInteger.setLower_limit(integerValue); }
+				| handleEndpointsAndVariablesForInteger(intervalInteger, true)
+			)
+			"," 
+			(
+				integerValue = getLongValue() 
+				{intervalInteger.setUpper_limit(integerValue);}
+				| handleEndpointsAndVariablesForInteger(intervalInteger, false)
+			)
+			)
+			|
+			< EMPTY_SET >
+			{ intervalFloat.emptyInterval(); }
+		)
+		"]"
+		{ return intervalInteger; }
+	)
+	)
+}
+
+void handleEndpointsAndVariablesForFloat(Interval<FloatingPoint> interval, boolean lower) : 
+{
+	GenericParameter <?> variable = null;
+  	Endpoints EndpointsValue = null;
+}
+{
+	(
+	variable = getVariableValue()
+	{
+		Class<?> intervalClass = interval.getTypeClass();
+		if (variable.hasType(intervalClass)) {
+			if (lower) {
+				interval.setLower_limit((FloatingPoint) variable.getValue());
+			} else {
+				interval.setUpper_limit((FloatingPoint) variable.getValue());
+			}
+		}
+		else if (variable.hasType(Endpoints.class)) {
+			EndpointsValue = (Endpoints) variable.getValue();
+		} 
+		else {
+			throw new ParseException(
+				getFalseTypeExceptionMessage(intervalClass.getName(), 
+				variable.getTypeClass().getSimpleName(), true));
+		}
+	}
+	|
+	EndpointsValue = getInfinityValue() 
+	)
+	{
+		if (EndpointsValue != null) {
+			if (lower) {
+				interval.setLowerEndpoint(EndpointsValue);
+			} else {
+				interval.setUpperEndpoint(EndpointsValue);
+			}
+		}
+	}
+}
+
+void handleEndpointsAndVariablesForInteger(Interval<Number> interval, boolean lower) : 
+{
+	GenericParameter <?> variable = null;
+  	Endpoints EndpointsValue = null, emptySet = null;
+}
+{
+	(
+	variable = getVariableValue()
+	{
+		Class<?> intervalClass = interval.getTypeClass();
+		if (variable.hasType(intervalClass)) {
+			if (lower) {
+				interval.setLower_limit((Number) variable.getValue());
+			} else {
+				interval.setUpper_limit((Number) variable.getValue());
+			}
+		}
+		else if (variable.hasType(Endpoints.class)) {
+			EndpointsValue = (Endpoints) variable.getValue();
+		} 
+		else {
+			throw new ParseException(
+				getFalseTypeExceptionMessage(intervalClass.getName(), 
+				variable.getTypeClass().getSimpleName(), true));
+		}
+	}
+	| 
+	EndpointsValue = getInfinityValue() 
+	)
+	{
+		if (EndpointsValue != null) {
+			if (lower) {
+				interval.setLowerEndpoint(EndpointsValue);
+			} else {
+				interval.setUpperEndpoint(EndpointsValue);
+			}
+		}
+	}
+}
+
+
+/* --------------------------------------------------------- */
+
+
