@@ -223,4 +223,12 @@ public abstract class ArithmeticLibrarySpecification {
 	 */
 	public abstract HashMap<Class<?>, String[]> getPositiveInfinityTranslation();
 
+
+	/**
+	 * Simple Parameter seperator like: ',' 
+	 * 
+	 * @return translated string
+	 */
+	public abstract String getParameterSeparator();
+
 }

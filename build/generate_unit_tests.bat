@@ -1,4 +1,4 @@
-set DSLFILE="input/test01.dsl"
+set DSLFILE="input/specification_example.dsl"
 set OUTPUT="output/"
 set JARFILE="ia_gen.jar"
 

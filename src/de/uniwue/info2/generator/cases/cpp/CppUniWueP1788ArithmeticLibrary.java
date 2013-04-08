@@ -31,6 +31,7 @@ import static de.uniwue.info2.generator.cases.PlaceHolder.NAME;
 import static de.uniwue.info2.generator.cases.PlaceHolder.PARAM_TYPE;
 import static de.uniwue.info2.generator.cases.PlaceHolder.TYPE;
 import static de.uniwue.info2.generator.cases.PlaceHolder.UPPER_VALUE;
+import static de.uniwue.info2.generator.cases.PlaceHolder.VAR_ARGS;
 import static de.uniwue.info2.generator.cases.PlaceHolder.inputName;
 import static de.uniwue.info2.generator.cases.PlaceHolder.outputName;
 import static de.uniwue.info2.generator.cases.PlaceHolder.outputType;
@@ -71,11 +72,16 @@ public class CppUniWueP1788ArithmeticLibrary extends ArithmeticLibrarySpecificat
 	}
 
 	@Override
+	public String getParameterSeparator() {
+		return ",";
+	}
+
+	@Override
 	public String getImportsAndDefinitions() {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("#include \"p1788/p1788.hpp\"\n");
 		buffer.append("template<typename T>\n");
-		buffer.append("using interval = "+ mix_type_loc + "interval<T, p1788::flavor::infsup::ieee754_flavor>;\n");
+		buffer.append("using interval = " + mix_type_loc + "interval<T, p1788::flavor::infsup::ieee754_flavor>;\n");
 		return buffer.toString();
 	}
 
@@ -89,29 +95,6 @@ public class CppUniWueP1788ArithmeticLibrary extends ArithmeticLibrarySpecificat
 	public String getIntervalLowerLimit() {
 		String lowerLimit = outputType(1) + " " + outputName(1) + " = " + inputName(1) + ".lower()" + ";";
 		return lowerLimit;
-	}
-
-
-	private void initOperationTranslation() {
-		if (op.isEmpty() || opmx.isEmpty()) {
-			String[] one_one = { "pos", "neg", "inv", "sqrt" };
-			String[] one_two = { "add", "sub", "mul", "div" };
-			String[] one_three = { "fma", "interval_case" };
-
-
-			for (String name : one_one) {
-				addOperationOneOneSingle(name);
-				addOperationOneOneMixType(name);
-			}
-			for (String name : one_two) {
-				addOperationOneTwoSingle(name);
-				addOperationOneTwoMixType(name);
-			}
-			for (String name : one_three) {
-				addOperationOneThreeSingle(name);
-				addOperationOneThreeMixType(name);
-			}
-		}
 	}
 
 	@Override
@@ -151,7 +134,8 @@ public class CppUniWueP1788ArithmeticLibrary extends ArithmeticLibrarySpecificat
 	public HashMap<Class<?>, String[]> getNegativeInfinityTranslation() {
 		HashMap<Class<?>, String[]> map = new HashMap<Class<?>, String[]>();
 
-		String infinity = TYPE + " " + NAME + " = " + "-INFINITY;";
+		// double output_01_lower = -std::numeric_limits<double>::infinity();
+		String infinity = TYPE + " " + NAME + " = " + "-std::numeric_limits<" + TYPE + ">::infinity();";
 
 		map.put(Short.class, new String[] { "short", infinity });
 		map.put(Integer.class, new String[] { "int", infinity });
@@ -167,7 +151,8 @@ public class CppUniWueP1788ArithmeticLibrary extends ArithmeticLibrarySpecificat
 	public HashMap<Class<?>, String[]> getPositiveInfinityTranslation() {
 		HashMap<Class<?>, String[]> map = new HashMap<Class<?>, String[]>();
 
-		String infinity = TYPE + " " + NAME + " = " + "+INFINITY;";
+		// String infinity = TYPE + " " + NAME + " = " + "+INFINITY;";
+		String infinity = TYPE + " " + NAME + " = " + "+std::numeric_limits<" + TYPE + ">::infinity();";
 
 		map.put(Short.class, new String[] { "short", infinity });
 		map.put(Integer.class, new String[] { "int", infinity });
@@ -179,58 +164,71 @@ public class CppUniWueP1788ArithmeticLibrary extends ArithmeticLibrarySpecificat
 		return map;
 	}
 
-	private void addOperationOneOneSingle(String name) {
-		// interval<double> lib_output_01 = pos(input_01);
-		String map = outputType(1) + " " + outputName(1) + " = " + name + "(" + inputName(1) + ");";
-		if (!op.containsKey(name)) {
-			op.put(name, map);
+	private void initOperationTranslation() {
+		if (op.isEmpty() || opmx.isEmpty()) {
+
+			String[] one_one = { "pos", "neg", "inv", "sqrt", "sqr", "exp", "exp2", "exp10", "log", "log2", "log10", "sin", "cos", "tan", "asin",
+					"acos", "atan", "sinh", "cosh", "tanh", "asinh", "acosh", "atanh", "sign", "ceil", "floor", "trunc", "round_ties_to_away",
+					"round_ties_to_even", "abs" };
+			String[] two_one = { "add", "sub", "mul", "div", "pown", "pow", "atan2" };
+			String[] three_one = { "fma", "interval_case" };
+			String[] one_one_var = { "min", "max" };
+
+			for (String name : one_one) {
+				addOperations(name, 1, false);
+			}
+			for (String name : two_one) {
+				addOperations(name, 2, false);
+			}
+			for (String name : three_one) {
+				addOperations(name, 3, false);
+			}
+			for (String name : one_one_var) {
+				addOperations(name, 1, true);
+			}
 		}
 	}
 
-	private void addOperationOneOneMixType(String name) {
-		// interval<double> lib_output_01 = pos(input_01);
-		String map = outputType(1) + " " + outputName(1) + " = " + mix_type_loc + name + "<" + outputType(1) + ">(" + inputName(1) + ");";
-		if (!opmx.containsKey(name)) {
-			opmx.put(name, map);
+	private void addOperations(String name, int input_count, boolean input_varargs) {
+		addOperation(name, input_count, false, input_varargs);
+		addOperation(name, input_count, true, input_varargs);
+	}	
+
+	private void addOperation(String name, int input_count, boolean mixed_type, boolean input_varargs) {
+		StringBuffer map = new StringBuffer();	
+		map.append(outputType(1) + " " + outputName(1) + " = ");	
+
+		if (mixed_type) {
+			map.append(mix_type_loc);
+			map.append(name);
+			map.append("<" + outputType(1) + ">");
+		}
+		else {
+			map.append(name);
+		}
+
+		map.append("(");
+
+		for (int i=1; i <= input_count; i++) {
+			map.append(inputName(i));
+			if (i < input_count) {
+				map.append(", ");
+			}
+		}
+
+		// TODO: momentan ist nur ein variabler parameter moeglich
+		if (input_varargs) {
+			map.append(VAR_ARGS);
+		}
+
+		map.append(");");
+
+		if (mixed_type && !opmx.containsKey(name)) {
+			opmx.put(name, map.toString());
+		}
+		else if (!op.containsKey(name)) {
+			op.put(name, map.toString());
 		}
 	}
-
-	private void addOperationOneTwoSingle(String name) {
-		// interval<double> lib_output_01 = add(input_01, input_02);
-		String map = outputType(1) + " " + outputName(1) + " = " + name + "(" + inputName(1) + ", " + inputName(2) + ");";
-		if (!op.containsKey(name)) {
-			op.put(name, map);
-		}
-	}
-
-	private void addOperationOneTwoMixType(String name) {
-		// interval<double> lib_output_01 = p1788::infsup::add<double>(input_01, input_02);
-		String map = outputType(1) + " " + outputName(1) + " = " + mix_type_loc + name + "<" + outputType(1) + ">(" + inputName(1) + ", "
-				+ inputName(2) + ");";
-		if (!opmx.containsKey(name)) {
-			opmx.put(name, map);
-		}
-	}
-
-
-	private void addOperationOneThreeSingle(String name) {
-		// interval<double> lib_output_01 = add(input_01, input_02);
-		String map = outputType(1) + " " + outputName(1) + " = " + name + "(" + inputName(1) + ", " + inputName(2) + ", " + inputName(3)+ ");";
-		if (!op.containsKey(name)) {
-			op.put(name, map);
-		}
-	}
-
-	private void addOperationOneThreeMixType(String name) {
-		// std::cout << "fma mt: " << p1788::infsup::fma<interval<float>>(d_a, f_b, d_c) << std::endl << std::endl;
-		String map = outputType(1) + " " + outputName(1) + " = " + mix_type_loc + name + "<" + outputType(1) + ">(" + inputName(1) + ", "
-				+ inputName(2) + ", " + inputName(3)+ ");";
-		if (!opmx.containsKey(name)) {
-			opmx.put(name, map);
-		}
-	}
-
-
-
 
 }

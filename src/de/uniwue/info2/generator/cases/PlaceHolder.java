@@ -79,6 +79,9 @@ public final class PlaceHolder {
 	public static final String NAME = ID + "NAME" + ID;
 	public static final String VALUE = ID + "VALUE" + ID;
 
+	// arbitrary number of values symbol
+	public static final String VAR_ARGS = ID + "__VAR_ARGS__" + ID;
+
 	/**
 	 * Adds spaces as intendentation.
 	 * 
@@ -123,6 +126,16 @@ public final class PlaceHolder {
 			throw new IllegalArgumentException("The sequenceNumber must begin with \"1\"!");
 		}
 		return ID + OPERATION_INPUT.replace(ID, "") + String.valueOf(sequenceNumber) + ID;
+	}
+
+
+	/**
+	 * Returns PlaceHolder for the name of the input parameter.
+	 * 
+	 * @return returns PlaceHolder-string for given parameter
+	 */
+	public static String outputName() {
+		return outputName(99); 
 	}
 
 	/**

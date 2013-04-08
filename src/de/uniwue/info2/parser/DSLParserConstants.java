@@ -62,6 +62,34 @@ public interface DSLParserConstants {
   int EMPTY_SET = 36;
   /** RegularExpression Id. */
   int EOL = 37;
+  /** RegularExpression Id. */
+  int CLOSE_PAR_LIST = 38;
+  /** RegularExpression Id. */
+  int OPEN_PAR_LIST = 39;
+  /** RegularExpression Id. */
+  int EQUAL = 40;
+  /** RegularExpression Id. */
+  int SP = 41;
+  /** RegularExpression Id. */
+  int NG = 42;
+  /** RegularExpression Id. */
+  int SUBSETEQ = 43;
+  /** RegularExpression Id. */
+  int SUBSETNEQ = 44;
+  /** RegularExpression Id. */
+  int SUPERSETEQ = 45;
+  /** RegularExpression Id. */
+  int SUPERSETNEQ = 46;
+  /** RegularExpression Id. */
+  int OPEN_TYPE = 47;
+  /** RegularExpression Id. */
+  int CLOSE_TYPE = 48;
+  /** RegularExpression Id. */
+  int OPEN_INTERVAL_VARS = 49;
+  /** RegularExpression Id. */
+  int CLOSE_INTERVAL_VARS = 50;
+  /** RegularExpression Id. */
+  int PRIMITIVE_PAR_SEP = 51;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -112,13 +140,23 @@ public interface DSLParserConstants {
     "\"+inf\"",
     "\"empty\"",
     "\";\"",
-    "\"pos\"",
-    "\"(\"",
     "\")\"",
+    "\"(\"",
     "\"=\"",
+    "\",\"",
+    "\"!\"",
+    "\"subseteq=\"",
+    "\"subsetneq=\"",
+    "\"superseteq=\"",
+    "\"supersetneq=\"",
+    "\"<\"",
+    "\">\"",
+    "\"[\"",
+    "\"]\"",
+    "\":\"",
+    "\"pos\"",
     "\"neg\"",
     "\"add\"",
-    "\",\"",
     "\"sub\"",
     "\"mul\"",
     "\"div\"",
@@ -126,14 +164,37 @@ public interface DSLParserConstants {
     "\"sqrt\"",
     "\"fma\"",
     "\"interval_case\"",
-    "\"median\"",
-    "\"is_in\"",
-    "\"bisect\"",
-    "\":\"",
-    "\"<\"",
-    "\">\"",
-    "\"[\"",
-    "\"]\"",
+    "\"sqr\"",
+    "\"pown\"",
+    "\"pow\"",
+    "\"exp\"",
+    "\"exp2\"",
+    "\"exp10\"",
+    "\"log\"",
+    "\"log2\"",
+    "\"log10\"",
+    "\"sin\"",
+    "\"cos\"",
+    "\"tan\"",
+    "\"asin\"",
+    "\"acos\"",
+    "\"atan\"",
+    "\"atan2\"",
+    "\"sinh\"",
+    "\"cosh\"",
+    "\"tanh\"",
+    "\"asinh\"",
+    "\"acosh\"",
+    "\"atanh\"",
+    "\"sign\"",
+    "\"ceil\"",
+    "\"floor\"",
+    "\"trunc\"",
+    "\"round_ties_to_even\"",
+    "\"round_ties_to_away\"",
+    "\"abs\"",
+    "\"min\"",
+    "\"max\"",
   };
 
 }

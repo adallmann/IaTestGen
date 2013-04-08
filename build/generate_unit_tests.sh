@@ -1,6 +1,6 @@
 #!/bin/bash
-DSLFILE="input/test02.dsl"
+DSLFILE="input/specification_example.dsl"
 OUTPUT="output/"
 JARFILE="ia_gen.jar"
 
-java -jar $JARFILE -i $DSLFILE -o $OUTPUT -s03
+java -jar $JARFILE -i $DSLFILE -o $OUTPUT

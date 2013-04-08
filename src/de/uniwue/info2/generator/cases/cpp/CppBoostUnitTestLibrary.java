@@ -25,6 +25,7 @@
 package de.uniwue.info2.generator.cases.cpp;
 
 import de.uniwue.info2.generator.cases.UnitTestLibrarySpecification;
+import de.uniwue.info2.operations.Set;
 
 import static de.uniwue.info2.generator.cases.PlaceHolder.*;
 
@@ -90,9 +91,44 @@ public class CppBoostUnitTestLibrary extends UnitTestLibrarySpecification {
 	}
 
 	@Override
-	public String getAssertFunction() {
-		String equalFunction = "BOOST_REQUIRE_EQUAL(" + EXPECTED_OUTPUT + ", "
-				+ CALCULATED_OUTPUT + ");";
+	public String getAssertFunction(Set set, boolean negate) {
+		String operator = "";
+		String equalFunction = "";
+
+		// if no set-relation is given
+		if (set == null) {
+			if (negate) {
+				operator = " != ";
+			}	
+			else {
+				operator = " == ";
+			}
+		}
+		else if (set == Set.PROPER_SUBSET || set == Set.SUBSET) {
+			if (negate) {
+				operator = " < ";
+			}	
+			else {
+				operator = " > ";
+			}
+		} else if (set == Set.PROPER_SUPERSET || set == Set.SUPERSET) {
+			if (negate) {
+				operator = " > ";
+			}	
+			else {
+				operator = " < ";
+			}
+		}
+
+		equalFunction += "BOOST_REQUIRE(" + CALCULATED_OUTPUT + operator 
+					+ EXPECTED_OUTPUT;
+
+		if ( set == Set.SUBSET || set == Set.SUPERSET) {
+			equalFunction += " || " + CALCULATED_OUTPUT + " == " 
+					+ EXPECTED_OUTPUT;
+		}
+
+		equalFunction += ");";
 		return equalFunction;
 	}
 }

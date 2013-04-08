@@ -24,6 +24,8 @@
  */
 package de.uniwue.info2.generator.cases;
 
+import de.uniwue.info2.operations.Set;
+
 /**
  * This class is used to translate structures of a unit test library.
  * 
@@ -92,5 +94,5 @@ public abstract class UnitTestLibrarySpecification {
 	 * 
 	 * @return
 	 */
-	public abstract String getAssertFunction();
+	public abstract String getAssertFunction(Set set, boolean negate);
 }

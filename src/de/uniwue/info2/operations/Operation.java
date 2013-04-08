@@ -39,36 +39,72 @@ public class Operation {
 	private String name_;
 	private String description_;
 	private boolean required_;
+	private Set used_set_;
+	private boolean result_negated_;
+	private Class<?> mixed_type_output_;
 
-	public String getDescription() {
-		return description_;
-	}
-
-	public void setDescription(String description) {
-		this.description_ = description;
-	}
-
-	public boolean isRequired() {
-		return required_;
-	}
-
-	public void setRequired(boolean required) {
-		this.required_ = required;
+	public Operation(String name) {
+		this.name_ = name;
+		this.required_ = true;
+		this.result_negated_ = false;
+		this.input_ = new ArrayList<GenericParameter<?>>();
+		this.output_ = new ArrayList<GenericParameter<?>>();
 	}
 
 	public Operation() {
 		this(null);
 	}
 
-	public Operation(String name) {
-		this.name_ = name;
-		this.required_ = true;
-		this.input_ = new ArrayList<GenericParameter<?>>();
-		this.output_ = new ArrayList<GenericParameter<?>>();
+	public void setDescription(String description) {
+		this.description_ = description;
+	}
+
+	public String getDescription() {
+		return description_;
+	}
+
+	public void setRequired(boolean required) {
+		this.required_ = required;
+	}
+
+	public boolean isRequired() {
+		return required_;
 	}
 
 	public void setName(String name) {
 		this.name_ = name;
+	}
+
+	public String getName() {
+		return this.name_;
+	}
+
+	public void negateResult() {
+		this.result_negated_ = true;
+	}
+
+	public boolean isNegated() {
+		return this.result_negated_;
+	}
+
+	public void setSetRelation(Set set) {
+		this.used_set_ = set;
+	}
+
+	public Set getSetRelation() {
+		return this.used_set_;
+	}
+
+	public void setMixedTypeOutput(Class<?> output) {
+		this.mixed_type_output_ = output;
+	}
+
+	public boolean isMixedType() {
+		return (this.mixed_type_output_ != null);
+	}
+
+	public Class<?> getMixedType() {
+		return this.mixed_type_output_;
 	}
 
 	public List<GenericParameter<?>> getInputList() {
@@ -85,10 +121,6 @@ public class Operation {
 
 	public void setOutput(List<GenericParameter<?>> output) {
 		this.output_ = output;
-	}
-
-	public String getName() {
-		return name_;
 	}
 
 	public void addInputParameter(GenericParameter<?> input) {

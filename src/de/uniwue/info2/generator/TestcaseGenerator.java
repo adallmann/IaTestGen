@@ -27,6 +27,7 @@ package de.uniwue.info2.generator;
 import static de.uniwue.info2.generator.cases.PlaceHolder.ARITHMETIC_EVAL;
 import static de.uniwue.info2.generator.cases.PlaceHolder.ARITHMETIC_LIB_IMPORTS;
 import static de.uniwue.info2.generator.cases.PlaceHolder.TEST_LIB_IMPORTS;
+import static de.uniwue.info2.generator.cases.PlaceHolder.VAR_ARGS;
 import static de.uniwue.info2.generator.cases.PlaceHolder.ASSERTS;
 import static de.uniwue.info2.generator.cases.PlaceHolder.CALCULATED_OUTPUT;
 import static de.uniwue.info2.generator.cases.PlaceHolder.CUSTOM_METHODS;
@@ -76,6 +77,7 @@ import de.uniwue.info2.operations.Endpoints;
 import de.uniwue.info2.operations.GenericParameter;
 import de.uniwue.info2.operations.Interval;
 import de.uniwue.info2.operations.Operation;
+import de.uniwue.info2.operations.Set;
 import de.uniwue.info2.parser.DSLParser;
 import de.uniwue.info2.parser.ParseException;
 
@@ -121,7 +123,7 @@ public class TestcaseGenerator {
 
 	private String lineComment_;
 	private Boolean littleEndian_;
-	private Class<?> currentOperationType;
+	private Class<?> currentMixedType;
 
 	private static final DecimalFormat INDEX = new DecimalFormat("00");
 
@@ -245,6 +247,9 @@ public class TestcaseGenerator {
 				Iterator<Operation> operationIterator = this.operations_.getOperations();
 				while (operationIterator.hasNext()) {
 					Operation operation = operationIterator.next();
+
+					// given mixed type
+					this.currentMixedType = operation.getMixedType();
 					boolean mixed_types = checkOperationForMixType(operation);
 
 					// testing if operation is implemented
@@ -265,7 +270,8 @@ public class TestcaseGenerator {
 						}
 
 						if (generateCurrentOp) {
-
+							Set currentSetConfig = operation.getSetRelation();
+							boolean isNegated = operation.isNegated();
 							// get raw test-method from unit-test-library
 							testMethods += uSpec.getTestMethod();
 
@@ -297,8 +303,7 @@ public class TestcaseGenerator {
 							// raw operation string by name
 							String function = "";
 
-							// check if operation is mixed type
-							currentOperationType = null;
+
 							if (mixed_types) {
 								function = this.currentMixedTypesOperationsTranslationTable_.get(operation.getName());
 							} else {
@@ -309,6 +314,7 @@ public class TestcaseGenerator {
 								throw new NullPointerException("function-translation is null!");
 							}
 
+							String var_arguments = "";
 							// declare all input parameter
 							for (int i = 0; i < input_parameter.size(); i++) {
 								GenericParameter<?> input = input_parameter.get(i);
@@ -327,7 +333,22 @@ public class TestcaseGenerator {
 								} else {
 									declarations += getParameterString(input, inputName);
 								}
-								function = function.replace(inputName(i + 1), inputName);
+
+								if (function.contains(inputName(i + 1))) {
+									function = function.replace(inputName(i + 1), inputName);
+								}
+								else if (function.contains(VAR_ARGS)) {
+									if (function.split(VAR_ARGS).length > 1) {
+										// TODO:
+										System.err.println("only one variable arguments parameter is possible");
+									}else {
+										var_arguments += aSpec.getParameterSeparator() + " "  + inputName; 
+									}
+								}
+							}
+
+							if (!var_arguments.isEmpty()) {
+									function = function.replace(VAR_ARGS, var_arguments);
 							}
 
 							// declare all output parameter
@@ -358,15 +379,15 @@ public class TestcaseGenerator {
 									String intervalType = this.currentTypeTranslation_.get(((Interval<?>) output.getValue()).getTypeClass())[0];
 
 									if (!interval.isEmpty()) {
-										assertString += getAssertFunctionForInterval(intervalType, expectedOutputName, outputName);
+										assertString += getAssertFunctionForInterval(intervalType, expectedOutputName, outputName, currentSetConfig, isNegated);
 									} else {
-										assertString += getAssertFunctionForEmptyInterval(expectedOutputName, outputName);
+										assertString += getAssertFunctionForEmptyInterval(expectedOutputName, outputName, currentSetConfig, isNegated);
 									}
 
 								} else {
 									declarations += getParameterString(output, expectedOutputName);
 									type = this.currentTypeTranslation_.get(output.getTypeClass())[0];
-									assertString += "\n" + getAssertString(expectedOutputName, outputName) + "\n";
+									assertString += "\n" + getAssertString(expectedOutputName, outputName, null, isNegated) + "\n";
 								}
 								function = function.replace(outputName(i + 1), outputName);
 								String[] intervalTranslation = this.currentTypeTranslation_.get(output.getTypeClass());
@@ -375,7 +396,6 @@ public class TestcaseGenerator {
 							// add comment to current operation function
 							declarations += "\n" + this.lineComment_ + " operation to test: " + operation.getName();
 							declarations += "\n" + function;
-
 							testMethods = replacePlaceHolder(testMethods, ARITHMETIC_EVAL, declarations);
 							testMethods = replacePlaceHolder(testMethods, ASSERTS, assertString);
 							testMethods += "\n\n";
@@ -443,14 +463,45 @@ public class TestcaseGenerator {
 		return false;
 	}
 
+
+	private boolean checkOperationForMixType(Operation operation) {
+		List<GenericParameter<?>> input = operation.getInputList();
+		List<GenericParameter<?>> output = operation.getOutputList();
+		boolean isMixedType = (checkParameterForMixedType(input) || checkParameterForMixedType(output));
+
+		this.currentMixedType = operation.getMixedType();
+		if (this.currentMixedType != null && output.size() == 1) {
+			if (output.get(0).hasType(Interval.class)) {
+				Interval<?> interval = (Interval<?>) output.get(0).getValue();
+				if (!interval.hasType(this.currentMixedType)) {
+					throw new IllegalArgumentException("\nERROR: Operation with name: \"" + operation.getName() 
+							+ "\" was declared with mixed types,\nbut doesn't use the declared output-parameter-type: " 
+							+ this.currentMixedType.getSimpleName() + "\n");
+				}
+			}	
+		}
+
+		if (this.currentMixedType != null) {
+			if (!isMixedType) {
+				System.err.println("NOTICE: Operation with name: \"" + operation.getName() 
+							+ "\" was declared with mixed types,\nbut actually has no mixed types!\n" );
+			}
+		}
+		else {
+
+		}
+		return isMixedType;
+	}
+
 	private boolean checkParameterForMixedType(List<GenericParameter<?>> parameter) {
+
 		for (int i = 0; i < parameter.size(); i++) {
 			GenericParameter<?> input = parameter.get(i);
 			if (input.hasType(Interval.class)) {
 				Interval<?> interval = (Interval<?>) input.getValue();
-				if (currentOperationType == null) {
-					currentOperationType = interval.getTypeClass();
-				} else if (!interval.hasType(currentOperationType)) {
+				if (this.currentMixedType == null) {
+					this.currentMixedType = interval.getTypeClass();
+				} else if (!interval.hasType(this.currentMixedType)) {
 					return true;
 				}
 			}
@@ -458,11 +509,6 @@ public class TestcaseGenerator {
 		return false;
 	}
 
-	private boolean checkOperationForMixType(Operation operation) {
-		List<GenericParameter<?>> input = operation.getInputList();
-		List<GenericParameter<?>> output = operation.getOutputList();
-		return (checkParameterForMixedType(input) || checkParameterForMixedType(output));
-	}
 
 	/**
 	 * Get blockcomment for given operation.
@@ -529,7 +575,7 @@ public class TestcaseGenerator {
 	 *         actual result
 	 * @return assert-function as string
 	 */
-	private String getAssertFunctionForInterval(String type, String expectedOutputName, String outputName) {
+	private String getAssertFunctionForInterval(String type, String expectedOutputName, String outputName, Set set, boolean negate) {
 		String first_lower_limit_name = "lo_" + expectedOutputName;
 		String second_lower_limit_name = "lo_" + outputName;
 
@@ -546,8 +592,27 @@ public class TestcaseGenerator {
 		String second_upper_limit_def = currentOperationsTranslationTable_.get("intervalUpperLimit").replace(outputType(1), type)
 				.replace(outputName(1), second_upper_limit_name).replace(inputName(1), outputName);
 
-		String lower_limit_test = getAssertString(first_lower_limit_name, second_lower_limit_name);
-		String upper_limit_test = getAssertString(first_upper_limit_name, second_upper_limit_name);
+		if (negate) {
+			negate = !negate;
+			if (set == Set.PROPER_SUBSET) {
+				set = Set.SUPERSET; 
+			}
+			else if (set == Set.SUBSET) {
+				set = Set.PROPER_SUPERSET;
+			}
+			else if (set == Set.PROPER_SUPERSET) {
+				set = Set.SUBSET;
+			}
+			else if (set == Set.SUPERSET) {
+				set = Set.PROPER_SUBSET;
+			}
+		}
+		
+		String lower_limit_test = getAssertString(first_lower_limit_name, second_lower_limit_name, set, negate);
+		if (set != null) {
+			negate = !negate;
+		}
+		String upper_limit_test = getAssertString(first_upper_limit_name, second_upper_limit_name, set, negate);
 
 		return ("\n" + first_lower_limit_def + "\n" + second_lower_limit_def + "\n" + lower_limit_test + "\n" + first_upper_limit_def + "\n"
 				+ second_upper_limit_def + "\n" + upper_limit_test + "\n");
@@ -562,7 +627,7 @@ public class TestcaseGenerator {
 	 *         actual result
 	 * @return assert-function as string
 	 */
-	private String getAssertFunctionForEmptyInterval(String expectedOutputName, String outputName) {
+	private String getAssertFunctionForEmptyInterval(String expectedOutputName, String outputName, Set set, boolean negate) {
 		String bool_expected = "bool_" + expectedOutputName;
 		String bool_output = "bool_" + outputName;
 		String type = this.currentTypeTranslation_.get(Boolean.class)[0];
@@ -572,7 +637,7 @@ public class TestcaseGenerator {
 		String second_lower_limit_def = currentOperationsTranslationTable_.get("intervalIsEmpty").replace(outputType(1), type)
 				.replace(outputName(1), bool_output).replace(inputName(1), outputName);
 
-		String lower_limit_test = getAssertString(bool_expected, bool_output);
+		String lower_limit_test = getAssertString(bool_expected, bool_output, set, negate);
 
 		return ("\n" + first_lower_limit_def + "\n" + second_lower_limit_def + "\n" + lower_limit_test + "\n");
 	}
@@ -586,8 +651,8 @@ public class TestcaseGenerator {
 	 *         actual output
 	 * @return assert function as string
 	 */
-	private String getAssertString(String first, String second) {
-		String assertString = currentUnitTestLibrary_.getAssertFunction();
+	private String getAssertString(String first, String second, Set set, boolean negate) {
+		String assertString = currentUnitTestLibrary_.getAssertFunction(set, negate);
 		assertString = assertString.replace(EXPECTED_OUTPUT, first);
 		assertString = assertString.replace(CALCULATED_OUTPUT, second);
 		return assertString;

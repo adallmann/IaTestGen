@@ -42,6 +42,7 @@ import de.uniwue.info2.numerics.FloatingPoint;
 import de.uniwue.info2.numerics.prec.DoublePrecisionFloat;
 import de.uniwue.info2.numerics.prec.SinglePrecisionFloat;
 import de.uniwue.info2.operations.GenericParameter;
+import de.uniwue.info2.operations.Set;
 import de.uniwue.info2.operations.Interval;
 import de.uniwue.info2.operations.Operation;
 import de.uniwue.info2.generator.OperationsPool;
@@ -63,15 +64,17 @@ public class DSLParser
 {
   // dsl information, updated by the dsl
   private static String dslAuthors, dslVersion, dslDescription;
-  
 
   // information for generated parser
   // if parser has been modified, update this information:
   private final static String parserDescription = 
   		"Early Version of Parser Generator";
   private final static String parserVersion = "0.8";
-  private final static String parserAuthors = "Michael Jedich";
-  
+  private final static String parserAuthors = "Copyright 2013\nMarco Nehmeier"
+			+ " (nehmeier@informatik.uni-wuerzburg.de)\n"
+			+ "Institute of Computer Science,\nUniversity of Wuerzburg, Germany"
+			+ "\n\nMichael Jedich (m.jedich@gmail.com)\n" 
+			+ "University of Wuerzburg, Germany";
   // variables specified in the dsl
   private HashMap<String, GenericParameter<?>> variables_;
   
@@ -83,7 +86,7 @@ public class DSLParser
   private String currentOperationDescription_ = null;
   private boolean currentOperationRequired_ = true;
   private boolean currentOperationInputMode_ = true;
-
+	private Class<?> currentMixedTypeOutput_ = null;
 
   // used for an exception message when handling variables
   private String lastUsedVariableName_;
@@ -290,6 +293,22 @@ TOKEN_MGR_DECLS :
 	
 	// end of line
 	| < EOL : ";" >
+
+	// 
+	| < CLOSE_PAR_LIST : ")" >
+	| < OPEN_PAR_LIST : "(" >
+	| < EQUAL : "=" >
+	| < SP : "," > 
+	| < NG : "!" > 
+	| < SUBSETEQ : "subseteq=" > 
+	| < SUBSETNEQ : "subsetneq=" > 
+	| < SUPERSETEQ : "superseteq=" > 
+	| < SUPERSETNEQ : "supersetneq=" > 
+	| < OPEN_TYPE : "<" >
+	| < CLOSE_TYPE : ">" >
+	| < OPEN_INTERVAL_VARS : "[" >
+	| < CLOSE_INTERVAL_VARS : "]" >
+	| < PRIMITIVE_PAR_SEP : ":" >
 }
 
 
@@ -339,44 +358,175 @@ void operation() :
 }
 {
   (
-  	operation = "pos" 						"(" interval() ")" 
-		switchToOutput() 							"="	interval()
-  |
-  	operation = "neg" 						"(" interval() ")" 
-		switchToOutput() 							"="	interval()
-  |
-  	operation = "add"							"(" interval() "," interval() ")" 	
-		switchToOutput() 							"=" interval()
-  |
-  	operation = "sub" 						"(" interval() "," interval() ")" 	
-		switchToOutput() 							"=" interval()
-  |
-  	operation = "mul" 						"(" interval() "," interval() ")" 	
-		switchToOutput() 							"=" interval()
-  |
-  	operation = "div" 						"(" interval() "," interval() ")" 	
-		switchToOutput() 							"=" interval()
-  |
-  	operation = "inv" 						"(" interval() ")" 	
-		switchToOutput() 							"=" interval()
-  |
-  	operation = "sqrt"		 				"(" interval() ")" 	
-		switchToOutput() 							"=" interval()
-  |
-  	operation = "fma"							"(" interval() "," interval() "," interval()")" 	
-		switchToOutput() 							"=" interval()
-  |
-  	operation = "interval_case" 	"(" interval() "," interval() "," interval()")" 	
-		switchToOutput() 							"=" interval()
-  |
+		// posibile parameters
+		// interval(),  bool(), number()
 
-
-
-  	operation = "median"  			"(" interval() ")" 					switchToOutput() "=" 	number()
+		// name of operation
+  	operation = "pos" 						
+		// input-parameter
+		input() interval()  
+		// output-parameter
+		output() interval()
   |
-  	operation = "is_in"	  			"(" number() "," interval() ")" 	switchToOutput() "=" 	bool()
+  	operation = "neg" 						 
+		input() interval()  
+		output() interval()
   |
-  	operation = "bisect"  			"(" interval() ")"					switchToOutput() "=" 	interval() "," interval()
+  	operation = "add" 
+ 		input()	interval() <SP> interval() 	
+		output() interval()
+  |
+  	operation = "sub" 
+ 		input()	interval() <SP> interval() 	
+		output() interval()
+  |
+  	operation = "mul"
+ 		input()	interval() <SP> interval() 	
+		output() interval()
+  |
+  	operation = "div"
+ 		input()	interval() <SP> interval() 	
+		output() interval()
+  |
+  	operation = "inv"
+		input() interval()  
+		output() interval()
+  |
+  	operation = "sqrt"
+		input() interval()  
+		output() interval()
+  |
+  	operation = "fma"						  	
+		input() interval() <SP> interval() <SP> interval()  
+		output() interval()
+  |
+  	operation = "interval_case"
+		input() interval() <SP> interval() <SP> interval()  
+		output() interval()
+	|
+		operation = "sqr"
+		input() interval()  
+		output() interval()
+	|
+		operation = "pown"
+		input() interval() <SP> number()
+		output() interval()
+  |
+  	operation = "pow"
+ 		input()	interval() <SP> interval() 	
+		output() interval()
+	|
+		operation = "exp"
+		input() interval()  
+		output() interval()
+	|
+		operation = "exp2"
+		input() interval()  
+		output() interval()
+	|
+		operation = "exp10"
+		input() interval()  
+		output() interval()
+	|
+		operation = "log"
+		input() interval()  
+		output() interval()
+	|
+		operation = "log2"
+		input() interval()  
+		output() interval()
+	|
+		operation = "log10"
+		input() interval()  
+		output() interval()
+	|
+		operation = "sin"
+		input() interval()  
+		output() interval()
+	|
+		operation = "cos"
+		input() interval()  
+		output() interval()
+	|
+		operation = "tan"
+		input() interval()  
+		output() interval()
+	|
+		operation = "asin"
+		input() interval()  
+		output() interval()
+	|
+		operation = "acos"
+		input() interval()  
+		output() interval()
+	|
+		operation = "atan"
+		input() interval()  
+		output() interval()
+  |
+  	operation = "atan2"
+ 		input()	interval() <SP> interval() 	
+		output() interval()
+	|
+		operation = "sinh"
+		input() interval()  
+		output() interval()
+	|
+		operation = "cosh"
+		input() interval()  
+		output() interval()
+	|
+		operation = "tanh"
+		input() interval()  
+		output() interval()
+	|
+		operation = "asinh"
+		input() interval()  
+		output() interval()
+	|
+		operation = "acosh"
+		input() interval()  
+		output() interval()
+	|
+		operation = "atanh"
+		input() interval()  
+		output() interval()
+	|
+		operation = "sign"
+		input() interval()  
+		output() interval()
+	|
+		operation = "ceil"
+		input() interval()  
+		output() interval()
+	|
+		operation = "floor"
+		input() interval()  
+		output() interval()
+	|
+		operation = "trunc"
+		input() interval()  
+		output() interval()
+	|
+		operation = "round_ties_to_even"
+		input() interval()  
+		output() interval()
+	|
+		operation = "round_ties_to_away"
+		input() interval()  
+		output() interval()
+	|
+		operation = "abs"
+		input() interval()  
+		output() interval()
+	|
+		operation = "min"
+		input() interval() (<SP> interval())+
+		output() interval()
+	|
+		operation = "max"
+		input() interval() (<SP> interval())+
+		output() interval()
   )
   
   < EOL >
@@ -388,10 +538,50 @@ void operation() :
 }
 
 
-void switchToOutput() :
-{}
+void output() :
+{ }
 {
- { this.currentOperationInputMode_ = false; }
+	< CLOSE_PAR_LIST > 
+	{ this.currentOperationInputMode_ = false; }
+  (
+		relationOperator()
+		|
+		(
+			// if result was negated
+	  	< NG >
+			{ this.currentOperation_.negateResult(); }
+ 	 		relationOperator()
+		)
+	)
+}
+
+
+void relationOperator() :
+{ }
+{
+ 	 (
+ 		< EQUAL > 
+ 	 )
+ 	 |
+ 	 (
+  	< SUBSETEQ > 	
+		{ this.currentOperation_.setSetRelation(Set.SUBSET); }
+ 	 )
+ 	 |
+ 	 (
+  	< SUBSETNEQ > 	
+		{ this.currentOperation_.setSetRelation(Set.PROPER_SUBSET); }
+ 	 )
+ 	 |
+ 	 (
+  	< SUPERSETEQ > 	
+		{ this.currentOperation_.setSetRelation(Set.SUPERSET); }
+ 	 )
+ 	 |
+ 	 (
+  	< SUPERSETNEQ > 	
+		{ this.currentOperation_.setSetRelation(Set.PROPER_SUPERSET); }
+ 	 )
 }
 
 
@@ -464,6 +654,72 @@ void commentTag(boolean operation) :
   )
 }
 
+/* ---------------------Handle Mix Types-------------------- */
+void input() :
+{ }
+{
+	(
+		( getReturnType() < OPEN_PAR_LIST > ) | < OPEN_PAR_LIST > 
+ 	)
+}
+
+// look for mixed type declaration
+void getReturnType() :
+{ }
+{
+	< OPEN_TYPE >
+	(
+		(
+			( < INTERVAL > )
+			< OPEN_TYPE >
+				(
+					(
+						< FLOAT > 
+						{ this.currentOperation_.setMixedTypeOutput(SinglePrecisionFloat.class); }
+					)
+					| 
+					(
+						< DOUBLE > 
+						{ this.currentOperation_.setMixedTypeOutput(DoublePrecisionFloat.class); }
+					)
+					|
+					(
+						< SHORT > 
+						{ this.currentOperation_.setMixedTypeOutput(Short.class); }
+					)
+					|
+					(
+						< INTEGER >
+						{ this.currentOperation_.setMixedTypeOutput(Integer.class); }
+					)
+					|
+					(
+						< LONG > 
+						{ this.currentOperation_.setMixedTypeOutput(Long.class); }
+					)
+				)
+			< CLOSE_TYPE >
+		)
+		| 
+		(
+			(< DOUBLE >)
+			{ this.currentOperation_.setMixedTypeOutput(DoublePrecisionFloat.class); }
+			|
+			(< FLOAT >)
+			{ this.currentOperation_.setMixedTypeOutput(SinglePrecisionFloat.class); }
+			|
+			(< INTEGER >)
+			{ this.currentOperation_.setMixedTypeOutput(Integer.class); }
+			|
+			(< SHORT> )
+			{ this.currentOperation_.setMixedTypeOutput(Short.class); }
+			|
+			(< LONG > )
+			{ this.currentOperation_.setMixedTypeOutput(Long.class); }
+		)
+	)
+	< CLOSE_TYPE >
+}
 
 /* ---------------------Handle variables-------------------- */
 
@@ -474,7 +730,7 @@ void variable() :
 	GenericParameter <?> par;
 }
 {
-	name = <VARIABLE_NAME> "=" par = getParameter() < EOL >
+	name = <VARIABLE_NAME> < EQUAL > par = getParameter() < EOL >
 	{
 		variables_.put(name.image, par);
 	}
@@ -539,22 +795,22 @@ GenericParameter <?> getParameter() :
 	Endpoints emptySetParam = null;
 }
 {
-	< SHORT > ":" shortParam = getShortValue()
+	< SHORT > < PRIMITIVE_PAR_SEP > shortParam = getShortValue()
 	{ return new GenericParameter<Short>(shortParam); }
 	
-	|< INTEGER > ":" integerParam = getIntegerValue()
+	|< INTEGER > < PRIMITIVE_PAR_SEP > integerParam = getIntegerValue()
 	{ return new GenericParameter<Integer>(integerParam); }
 	
-	|< LONG > ":" longParam = getLongValue()
+	|< LONG > < PRIMITIVE_PAR_SEP > longParam = getLongValue()
 	{ return new GenericParameter<Long>(longParam); }
 	
-	|< FLOAT > ":" floatParam = getSinglePrecisionFloatValue()
+	|< FLOAT > < PRIMITIVE_PAR_SEP > floatParam = getSinglePrecisionFloatValue()
 	{ return new GenericParameter<SinglePrecisionFloat>(floatParam); }
 	
-	|< DOUBLE > ":" doubleParam = getDoublePrecisionFloatValue()
+	|< DOUBLE > < PRIMITIVE_PAR_SEP > doubleParam = getDoublePrecisionFloatValue()
 	{ return new GenericParameter<DoublePrecisionFloat>(doubleParam); }
 	
-	|(< BOOL > ":")? boolParam = getBoolValue()
+	|(< BOOL > < PRIMITIVE_PAR_SEP >)? boolParam = getBoolValue()
 	{ return new GenericParameter<Boolean>(boolParam); }
 	
 	| intervalParam = getIntervalParameter()
@@ -687,9 +943,9 @@ void floatingPoint() :
 	FloatingPoint fp;
 }
 {
-	(< FLOAT > ":") fp = getSinglePrecisionFloatValue() 
+	(< FLOAT > < PRIMITIVE_PAR_SEP >) fp = getSinglePrecisionFloatValue() 
 	| 
-	(< DOUBLE > ":") fp = getDoublePrecisionFloatValue() 
+	(< DOUBLE > < PRIMITIVE_PAR_SEP >) fp = getDoublePrecisionFloatValue() 
 	addParameterToFunction(new GenericParameter<FloatingPoint> (fp))
 }
 
@@ -699,9 +955,9 @@ void integer() :
 }
 {
 		(
-		(< SHORT > ":") num = getShortValue()
-		| (< INTEGER > ":") num = getIntegerValue()
-		| (< LONG > ":") num = getLongValue()
+		(< SHORT > < PRIMITIVE_PAR_SEP >) num = getShortValue()
+		| (< INTEGER > < PRIMITIVE_PAR_SEP >) num = getIntegerValue()
+		| (< LONG > < PRIMITIVE_PAR_SEP >) num = getLongValue()
 		)
 	 	addParameterToFunction(new GenericParameter<Number> (num))
 }
@@ -758,11 +1014,11 @@ Interval<?> getIntervalParameter() :
 
 {
 
-	(< INTERVAL > "<")
+	(< INTERVAL > < OPEN_TYPE >)
 	(
 	(
-		< FLOAT > ">" 
-		"["
+		< FLOAT > < CLOSE_TYPE > 
+		< OPEN_INTERVAL_VARS >
 		{ intervalFloat.specifySubclass(SinglePrecisionFloat.class); }
 		(
 			(  
@@ -771,7 +1027,7 @@ Interval<?> getIntervalParameter() :
 				{ intervalFloat.setLower_limit(floatValue); }
 				| handleEndpointsAndVariablesForFloat(intervalFloat, true)
 			)
-			"," 
+			< SP > 
 			(
 				floatValue = getSinglePrecisionFloatValue() 
 				{intervalFloat.setUpper_limit(floatValue);}
@@ -782,13 +1038,13 @@ Interval<?> getIntervalParameter() :
 			< EMPTY_SET >
 			{ intervalFloat.emptyInterval(); }
 		)
-		"]"
+		< CLOSE_INTERVAL_VARS >
 		{ return intervalFloat; }
 	)
 	| 
 	(
-		< DOUBLE > ">" 
-		"["
+		< DOUBLE > < CLOSE_TYPE > 
+		< OPEN_INTERVAL_VARS >
 		{ intervalFloat.specifySubclass(DoublePrecisionFloat.class); }
 		(
 			(  
@@ -797,7 +1053,7 @@ Interval<?> getIntervalParameter() :
 				{ intervalFloat.setLower_limit(floatValue); }
 				| handleEndpointsAndVariablesForFloat(intervalFloat, true)
 			)
-			"," 
+			< SP > 
 			(
 				floatValue = getDoublePrecisionFloatValue() 
 				{intervalFloat.setUpper_limit(floatValue);}
@@ -808,13 +1064,13 @@ Interval<?> getIntervalParameter() :
 			< EMPTY_SET >
 			{ intervalFloat.emptyInterval(); }
 		)
-		"]"
+		< CLOSE_INTERVAL_VARS >
 		{ return intervalFloat; }
 	)
 	|
 	(
-		< SHORT > ">" 
-		"["
+		< SHORT > < CLOSE_TYPE > 
+		< OPEN_INTERVAL_VARS >
 		{ intervalInteger.specifySubclass(Short.class); }
 		(
 			(  
@@ -823,7 +1079,7 @@ Interval<?> getIntervalParameter() :
 				{ intervalInteger.setLower_limit(integerValue); }
 				| handleEndpointsAndVariablesForInteger(intervalInteger, true)
 			)
-			"," 
+			< SP > 
 			(
 				integerValue = getShortValue() 
 				{intervalInteger.setUpper_limit(integerValue);}
@@ -834,13 +1090,13 @@ Interval<?> getIntervalParameter() :
 			< EMPTY_SET >
 			{ intervalFloat.emptyInterval(); }
 		)
-		"]"
+		< CLOSE_INTERVAL_VARS >
 		{ return intervalInteger; }
 	)
 	|
 	(
-		< INTEGER > ">" 
-		"["
+		< INTEGER > < CLOSE_TYPE > 
+		< OPEN_INTERVAL_VARS >
 		{ intervalInteger.specifySubclass(Integer.class); }
 		(
 			(  
@@ -849,7 +1105,7 @@ Interval<?> getIntervalParameter() :
 				{ intervalInteger.setLower_limit(integerValue); }
 				| handleEndpointsAndVariablesForInteger(intervalInteger, true)
 			)
-			"," 
+			< SP > 
 			(
 				integerValue = getIntegerValue() 
 				{intervalInteger.setUpper_limit(integerValue);}
@@ -859,13 +1115,13 @@ Interval<?> getIntervalParameter() :
 			|
 			< EMPTY_SET >
 			{ intervalFloat.emptyInterval(); }		)
-		"]"
+		< CLOSE_INTERVAL_VARS >
 		{ return intervalInteger; }
 	)
 	|
 	(
-		< LONG > ">" 
-		"["
+		< LONG > < CLOSE_TYPE > 
+		< OPEN_INTERVAL_VARS >
 		{ intervalInteger.specifySubclass(Long.class); }
 		(
 			(  
@@ -874,7 +1130,7 @@ Interval<?> getIntervalParameter() :
 				{ intervalInteger.setLower_limit(integerValue); }
 				| handleEndpointsAndVariablesForInteger(intervalInteger, true)
 			)
-			"," 
+			< SP > 
 			(
 				integerValue = getLongValue() 
 				{intervalInteger.setUpper_limit(integerValue);}
@@ -885,7 +1141,7 @@ Interval<?> getIntervalParameter() :
 			< EMPTY_SET >
 			{ intervalFloat.emptyInterval(); }
 		)
-		"]"
+		< CLOSE_INTERVAL_VARS >
 		{ return intervalInteger; }
 	)
 	)
