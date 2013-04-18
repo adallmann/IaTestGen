@@ -57,7 +57,7 @@ float hex_string_to_float(std::string hexStr) {
 }
 
 // Hex to Double Conversion
-unsigned double_length = sizeof(double);
+const unsigned double_length = sizeof(double);
 double hex_string_to_double(std::string hexStr) {
 	unsigned char temp[double_length];
 	std::string searchString("0x");

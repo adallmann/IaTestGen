@@ -34,7 +34,7 @@ COMPILE_JAVACC=false
 # generate tests-source for all available specifications
 GENERATE_TESTS=true
 # compile tests
-COMPILE_CPP_TESTS=false
+COMPILE_CPP_TESTS=true
 # run tests
 RUN_TESTS=true
 ##################################################################
