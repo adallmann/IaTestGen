@@ -61,35 +61,37 @@ public interface DSLParserConstants {
   /** RegularExpression Id. */
   int EMPTY_SET = 36;
   /** RegularExpression Id. */
-  int EOL = 37;
+  int ENTIRE_SET = 37;
   /** RegularExpression Id. */
-  int CLOSE_PAR_LIST = 38;
+  int EOL = 38;
   /** RegularExpression Id. */
-  int OPEN_PAR_LIST = 39;
+  int CLOSE_PAR_LIST = 39;
   /** RegularExpression Id. */
-  int EQUAL = 40;
+  int OPEN_PAR_LIST = 40;
   /** RegularExpression Id. */
-  int SP = 41;
+  int EQUAL = 41;
   /** RegularExpression Id. */
-  int NG = 42;
+  int SP = 42;
   /** RegularExpression Id. */
-  int SUBSETEQ = 43;
+  int NG = 43;
   /** RegularExpression Id. */
-  int SUBSETNEQ = 44;
+  int SUBSETEQ = 44;
   /** RegularExpression Id. */
-  int SUPERSETEQ = 45;
+  int SUBSETNEQ = 45;
   /** RegularExpression Id. */
-  int SUPERSETNEQ = 46;
+  int SUPERSETEQ = 46;
   /** RegularExpression Id. */
-  int OPEN_TYPE = 47;
+  int SUPERSETNEQ = 47;
   /** RegularExpression Id. */
-  int CLOSE_TYPE = 48;
+  int OPEN_TYPE = 48;
   /** RegularExpression Id. */
-  int OPEN_INTERVAL_VARS = 49;
+  int CLOSE_TYPE = 49;
   /** RegularExpression Id. */
-  int CLOSE_INTERVAL_VARS = 50;
+  int OPEN_INTERVAL_VARS = 50;
   /** RegularExpression Id. */
-  int PRIMITIVE_PAR_SEP = 51;
+  int CLOSE_INTERVAL_VARS = 51;
+  /** RegularExpression Id. */
+  int PRIMITIVE_PAR_SEP = 52;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -139,6 +141,7 @@ public interface DSLParserConstants {
     "\"-inf\"",
     "\"+inf\"",
     "\"empty\"",
+    "\"entire\"",
     "\";\"",
     "\")\"",
     "\"(\"",
@@ -154,6 +157,32 @@ public interface DSLParserConstants {
     "\"[\"",
     "\"]\"",
     "\":\"",
+    "\"intersect\"",
+    "\"hull\"",
+    "\"inf\"",
+    "\"sup\"",
+    "\"mid\"",
+    "\"rad\"",
+    "\"mid_rad\"",
+    "\"wid\"",
+    "\"mag\"",
+    "\"mig\"",
+    "\"is_empty\"",
+    "\"is_entire\"",
+    "\"is_equal\"",
+    "\"contained_in\"",
+    "\"contains\"",
+    "\"less\"",
+    "\"greater\"",
+    "\"precedes\"",
+    "\"succeeds\"",
+    "\"is_interior\"",
+    "\"contains_interior\"",
+    "\"strictly_less\"",
+    "\"strictly_greater\"",
+    "\"strictly_precedes\"",
+    "\"strictly_succeeds\"",
+    "\"are_disjoint\"",
     "\"pos\"",
     "\"neg\"",
     "\"add\"",
@@ -195,6 +224,40 @@ public interface DSLParserConstants {
     "\"abs\"",
     "\"min\"",
     "\"max\"",
+    "\"sqr_rev\"",
+    "\"inv_rev\"",
+    "\"abs_rev\"",
+    "\"pown_rev\"",
+    "\"sin_rev\"",
+    "\"cos_rev\"",
+    "\"tan_rev\"",
+    "\"cosh_rev\"",
+    "\"mul_rev\"",
+    "\"div_rev1\"",
+    "\"div_rev2\"",
+    "\"pow_rev1\"",
+    "\"pow_rev2\"",
+    "\"atan2_rev1\"",
+    "\"atan2_rev2\"",
+    "\"cancel_plus\"",
+    "\"cancel_minus\"",
+    "\"rootn\"",
+    "\"expm1\"",
+    "\"exp2m1\"",
+    "\"exp10m1\"",
+    "\"logp1\"",
+    "\"log2p1\"",
+    "\"log10p1\"",
+    "\"compoundm1\"",
+    "\"hypot\"",
+    "\"r_sqrt\"",
+    "\"sin_pi\"",
+    "\"cos_pi\"",
+    "\"tan_pi\"",
+    "\"asin_pi\"",
+    "\"acos_pi\"",
+    "\"atan_pi\"",
+    "\"atan2_pi\"",
   };
 
 }

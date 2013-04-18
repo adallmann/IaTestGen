@@ -24,10 +24,17 @@
 // 
 
 
+// -----------------------------------------------------------------------------
+// Unit Tests will be generated with given Annotations: 
+// @author, @version, @description
+// close annotations with a semicolon
+// -----------------------------------------------------------------------------
+
 /**
  * Example Domain-Specific-Language.
  *
  * @author 
+ *    Marco Nehmeier,
  *		Michael Jedich;
  * @version 
  *		0.8, 21.03.2013;
@@ -35,104 +42,151 @@
  *		Sample-file with a couple of simple testfunctions for libieeep1788;
  */
 
-// sample variables: 
+  
+// -----------------------------------------------------------------------------
+// Some examples of variables 
+// -----------------------------------------------------------------------------
+
 $lowerLimit01 		= double: 0x3FC0A3D70A3D70A4;
 $upperLimit01 		= double: 0x3FCD70A3D70A3D71;
 $lowerLimit02 		= float: 	0xC0D05BC0;
 $upperLimit02 		= float: 	0x414E147B;
-$sampleInteter 		= int: 		5;
+$sampleInteger 		= int: 		5;
 $sampleInterval 	= interval<double>[$lowerLimit01, 0x3FDD70A3D70A3D71];
 $sampleInfinite 	= interval<double>[-inf, +inf];
 
 
+
 // -----------------------------------------------------------------------------
-// Forward elementary functions
+// posible set operators:
+// -----------------------------------------------------------------------------
+// supersetneq= // --> proper superset
+// superseteq= 
+// subsetneq= // --> proper subset
+// subseteq=
+// -----------------------------------------------------------------------------
+
+
+// -----------------------------------------------------------------------------
+// Non-arithmetic set operations, see P1788/D7.1 Sect. 9.6.7
 // -----------------------------------------------------------------------------
 
 /**
- * Addition-test.
+ * Intersect-test. Each operation-test can have its own description.
  * @description 
  *	  default - no mixed types;	
  * @required
  * 		true;
  */
-add( interval<double>[10.0, 15.0], interval<double>[1.0, 2.0] ) = $sampleInfinite;
+intersect( interval<double>[0x3FC0A3D70A3D70A4, 0x3FCD70A3D70A3D71], 
+	interval<double>[1, 2] ) = $sampleInterval;
+intersect<interval<float>>( interval<double>[0x3FC0A3D70A3D70A4, 0x3FCD70A3D70A3D71], 
+	interval<float>[1, 2] ) = interval<float>[-inf, +inf];
 
-/**
- * @description
- * 		calculated result should be a PROPER SUBSET of the expected;
- * @required
- * 		true;
- */
-add( interval<double>[10, 15], interval<double>[1, 2] ) subsetneq= interval<double>[-inf, +inf];
-
-/**
- * @description
- * 		calculated result should be NOT A PROPER SUBSET of the expected (--> superset);
- * @required
- * 		true;
- */
-add( interval<double>[10, 15], interval<double>[1, 2] ) !subsetneq= interval<double>[-inf, +inf];
-
-/**
- * @description
- * 		calculated result should be a SUBSET (not proper subset) of the expected;
- * @required
- * 		true;
- */
-add( interval<double>[10, 15], interval<double>[1, 2] ) subseteq= interval<double>[-inf, +inf];
-
-/**
- * @description
- * 		calculated result should be a PROPER SUPERSET of the expected;
- * @required
- * 		true;
- */
-add( interval<double>[10, 15], interval<double>[1, 2] ) supersetneq= interval<double>[-inf, +inf];
-
-/**
- * @description
- * 		calculated result should be a SUPERSET (not a proper one) of the expected;
- * @required
- * 		true;
- */
-add( interval<double>[10, 15], interval<double>[1, 2] ) superseteq= interval<double>[-inf, +inf];
-
-/**
- * @description 
- *		-addition operation with mixed data types
- * 		-negation;
- * @required
- * 		true;
- */
-add<interval<double>>( interval<double>[10, 15], interval<float>[1, 2] ) 
-	!= interval<double>[5.0, 9];
-
-/**
- * Multiplication-test.
- * @description 
- *		with mixed data types;
- * @required
- * 		true;
- */
-mul<interval<float>>( interval<double>[10, 15], interval<float>[1, 2] ) 
+hull( interval<double>[10, 15], interval<double>[1, 2] ) 
+	= interval<double>[-inf, +inf];
+hull<interval<float>>( interval<double>[10, 15], interval<float>[1, 2] ) 
 	= interval<float>[-inf, +inf];
 
+// -----------------------------------------------------------------------------
+// Numeric functions on intervals, see P1788/D7.1 Sect. 9.6.9
+// -----------------------------------------------------------------------------
 
-// ---------------------------------------------------------------------
+inf( interval<double>[10, 15]) = double: 12;
+
+sup( interval<double>[10, 15]) != double: 12;
+
+mid( interval<double>[10, 15]) = double: 12;
+
+rad( interval<double>[10, 15]) = double: 12;
+
+mid_rad( interval<double>[10, 15]) = double: 7, double: 8;
+
+wid( interval<double>[10, 15]) = double: 12;
+
+mag( interval<double>[10, 15]) = double: 12;
+
+mig( interval<double>[10, 15]) = double: 12;
+
+// -----------------------------------------------------------------------------
+// Boolean functions on intervals, see P1788/D7.0 Sect. 9.6.10
+// -----------------------------------------------------------------------------
+
+// is_empty( interval<float>[empty] ) = true;
+// 
+// is_entire( interval<float>[entire] ) = false;
+// 
+// is_equal( interval<float>[1,2], interval<float>[1,2] ) = true;
+// 
+// contained_in( interval<float>[1,2], interval<float>[1,2] ) = true;
+// 
+// contains( interval<float>[1,2], interval<float>[1,2] ) = true;
+// 
+// less( interval<float>[1,2], interval<float>[1,2] ) = true;
+// 
+// greater( interval<float>[1,2], interval<float>[1,2] ) = true;
+// 
+// precedes( interval<float>[1,2], interval<float>[1,2] ) = true;
+// 
+// succeeds( interval<float>[1,2], interval<float>[1,2] ) = true;
+// 
+// is_interior( interval<float>[1,2], interval<float>[1,2] ) = true;
+// 
+// contains_interior( interval<float>[1,2], interval<float>[1,2] ) = true;
+// 
+// strictly_less( interval<float>[1,2], interval<float>[1,2] ) = true;
+// 
+// strictly_greater( interval<float>[1,2], interval<float>[1,2] ) = true;
+// 
+// strictly_precedes( interval<float>[1,2], interval<float>[1,2] ) = true;
+// 
+// strictly_succeeds( interval<float>[1,2], interval<float>[1,2] ) = true;
+// 
+// are_disjoint( interval<float>[1,2], interval<float>[1,2] ) = true;
+
+// -----------------------------------------------------------------------------
+// Forward elementary functions
+// -----------------------------------------------------------------------------
 
 pos( interval<double>[10, 15] ) = interval<double>[-inf, +inf];
 pos<interval<float>>(interval<double>[10, 15] ) = interval<float>[-inf, +inf];
 
 neg( interval<double>[10, 15] ) = interval<double>[-inf, +inf];
 neg<interval<float>>(interval<double>[10, 15] ) = interval<float>[-inf, +inf];
+ 
+add( interval<double>[10, 15], interval<double>[1, 2] ) superseteq= interval<double>[-inf, +inf];
+add<interval<double>>( interval<double>[10, 15], interval<float>[1, 2] ) 
+	!= interval<double>[5.0, 9];
+
+sub<interval<float>>( interval<double>[10, 15], interval<float>[1, 2] ) 
+	= interval<float>[-inf, +inf];
+sub<interval<double>>( interval<double>[10, 15], interval<float>[1, 2] ) 
+	= interval<double>[5.0, 9];
+
+mul<interval<float>>( interval<double>[10, 15], interval<float>[1, 2] ) 
+	= interval<float>[-inf, +inf];
+mul<interval<double>>( interval<double>[10, 15], interval<float>[1, 2] ) 
+	= interval<double>[5.0, 9];
+
+div<interval<float>>( interval<double>[10, 15], interval<float>[1, 2] ) 
+	= interval<float>[-inf, +inf];
+div<interval<double>>( interval<double>[10, 15], interval<float>[1, 2] ) 
+	= interval<double>[5.0, 9];
 
 inv( interval<double>[10, 15] ) = interval<double>[-inf, +inf];
 inv<interval<float>>(interval<double>[10, 15] ) = interval<float>[-inf, +inf];
 
+sqrt( interval<double>[10, 15] ) = interval<double>[-inf, +inf];
+sqrt<interval<float>>(interval<double>[10, 15] ) = interval<float>[-inf, +inf];
+
 fma( interval<double>[10, 15], interval<double>[1, 2], 
 	interval<double>[1, 2] ) = interval<double>[-inf, +inf];
 fma<interval<double>>( interval<double>[10, 15], interval<float>[1, 2], 
+	interval<double>[1, 2] ) = interval<double>[-inf, +inf];
+
+interval_case( interval<double>[10, 15], interval<double>[1, 2], 
+	interval<double>[1, 2] ) = interval<double>[-inf, +inf];
+interval_case<interval<double>>( interval<double>[10, 15], interval<float>[1, 2], 
 	interval<double>[1, 2] ) = interval<double>[-inf, +inf];
 
 sqr(interval<double>[10, 15]) = interval<double>[-inf, +inf];
@@ -233,13 +287,114 @@ min<interval<float>>(interval<double>[10, 15], interval<double>[10, 15],
 max(interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
 max<interval<float>>(interval<double>[10, 15], interval<double>[10, 15], 
 	interval<double>[10, 15], interval<double>[10, 15]) = interval<float>[-inf, +inf];
-
+ 
 // -----------------------------------------------------------------------------
 // Reverse elementary functions, see P1788/D7.0 Sect. 9.6.5 Table 2
 // -----------------------------------------------------------------------------
 
 // reverse version of unary point functions
 
+sqr_rev(interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+sqr_rev<interval<float>>(interval<double>[10, 15], interval<double>[10, 15]) = interval<float>[-inf, +inf];
+sqr_rev(interval<double>[10, 15]) = interval<double>[-inf, +inf];
+sqr_rev<interval<float>>(interval<double>[10, 15]) = interval<float>[-inf, +inf];
+
+inv_rev(interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+inv_rev<interval<float>>(interval<double>[10, 15], interval<double>[10, 15]) = interval<float>[-inf, +inf];
+inv_rev(interval<double>[10, 15]) = interval<double>[-inf, +inf];
+inv_rev<interval<float>>(interval<double>[10, 15]) = interval<float>[-inf, +inf];
+
+abs_rev(interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+abs_rev<interval<float>>(interval<double>[10, 15], interval<double>[10, 15]) = interval<float>[-inf, +inf];
+abs_rev(interval<double>[10, 15]) = interval<double>[-inf, +inf];
+abs_rev<interval<float>>(interval<double>[10, 15]) = interval<float>[-inf, +inf];
+
+pown_rev(interval<double>[10, 15], interval<double>[10, 15], int: 5) = interval<double>[-inf, +inf];
+pown_rev<interval<float>>(interval<double>[10, 15], interval<double>[10, 15], int: 5) = interval<float>[-inf, +inf];
+pown_rev(interval<double>[10, 15], int:5) = interval<double>[-inf, +inf];
+pown_rev<interval<float>>(interval<double>[10, 15], int:5) = interval<float>[-inf, +inf];
+
+sin_rev(interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+sin_rev<interval<float>>(interval<double>[10, 15], interval<double>[10, 15]) = interval<float>[-inf, +inf];
+sin_rev(interval<double>[10, 15]) = interval<double>[-inf, +inf];
+sin_rev<interval<float>>(interval<double>[10, 15]) = interval<float>[-inf, +inf];
+
+cos_rev(interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+cos_rev<interval<float>>(interval<double>[10, 15], interval<double>[10, 15]) = interval<float>[-inf, +inf];
+cos_rev(interval<double>[10, 15]) = interval<double>[-inf, +inf];
+cos_rev<interval<float>>(interval<double>[10, 15]) = interval<float>[-inf, +inf];
+
+tan_rev(interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+tan_rev<interval<float>>(interval<double>[10, 15], interval<double>[10, 15]) = interval<float>[-inf, +inf];
+tan_rev(interval<double>[10, 15]) = interval<double>[-inf, +inf];
+tan_rev<interval<float>>(interval<double>[10, 15]) = interval<float>[-inf, +inf];
+
+cosh_rev(interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+cosh_rev<interval<float>>(interval<double>[10, 15], interval<double>[10, 15]) = interval<float>[-inf, +inf];
+cosh_rev(interval<double>[10, 15]) = interval<double>[-inf, +inf];
+cosh_rev<interval<float>>(interval<double>[10, 15]) = interval<float>[-inf, +inf];
+
+mul_rev(interval<double>[10, 15], interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+mul_rev<interval<float>>(interval<double>[10, 15], interval<float>[10, 15], interval<double>[10, 15]) = interval<float>[-inf, +inf];
+mul_rev(interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+mul_rev<interval<float>>(interval<double>[10, 15], interval<float>[10, 15]) = interval<float>[-inf, +inf];
+
+div_rev1(interval<double>[10, 15], interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+div_rev1<interval<float>>(interval<double>[10, 15], interval<float>[10, 15], interval<double>[10, 15]) = interval<float>[-inf, +inf];
+div_rev1(interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+div_rev1<interval<float>>(interval<double>[10, 15], interval<float>[10, 15]) = interval<float>[-inf, +inf];
+
+div_rev2(interval<double>[10, 15], interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+div_rev2<interval<float>>(interval<double>[10, 15], interval<float>[10, 15], interval<double>[10, 15]) = interval<float>[-inf, +inf];
+div_rev2(interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+div_rev2<interval<float>>(interval<double>[10, 15], interval<float>[10, 15]) = interval<float>[-inf, +inf];
+
+pow_rev1(interval<double>[10, 15], interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+pow_rev1<interval<float>>(interval<double>[10, 15], interval<float>[10, 15], interval<double>[10, 15]) = interval<float>[-inf, +inf];
+pow_rev1(interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+pow_rev1<interval<float>>(interval<double>[10, 15], interval<float>[10, 15]) = interval<float>[-inf, +inf];
+
+pow_rev2(interval<double>[10, 15], interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+pow_rev2<interval<float>>(interval<double>[10, 15], interval<float>[10, 15], interval<double>[10, 15]) = interval<float>[-inf, +inf];
+pow_rev2(interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+pow_rev2<interval<float>>(interval<double>[10, 15], interval<float>[10, 15]) = interval<float>[-inf, +inf];
+
+atan2_rev1(interval<double>[10, 15], interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+atan2_rev1<interval<float>>(interval<double>[10, 15], interval<float>[10, 15], interval<double>[10, 15]) = interval<float>[-inf, +inf];
+atan2_rev1(interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+atan2_rev1<interval<float>>(interval<double>[10, 15], interval<float>[10, 15]) = interval<float>[-inf, +inf];
+
+atan2_rev2(interval<double>[10, 15], interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+atan2_rev2<interval<float>>(interval<double>[10, 15], interval<float>[10, 15], interval<double>[10, 15]) = interval<float>[-inf, +inf];
+atan2_rev2(interval<double>[10, 15], interval<double>[10, 15]) = interval<double>[-inf, +inf];
+atan2_rev2<interval<float>>(interval<double>[10, 15], interval<float>[10, 15]) = interval<float>[-inf, +inf];
 
 
+// -----------------------------------------------------------------------------
+// Cancellative addition and subtraction, see P1788/D7.0 Sect. 9.6.6
+// -----------------------------------------------------------------------------
 
+cancel_plus<interval<float>>( interval<double>[10, 15], interval<float>[1, 2] ) = interval<float>[-inf, +inf];
+cancel_plus( interval<double>[10, 15], interval<double>[1, 2] ) = interval<double>[-inf, +inf];
+
+cancel_minus<interval<float>>( interval<double>[10, 15], interval<float>[1, 2] ) = interval<float>[-inf, +inf];
+cancel_minus( interval<double>[10, 15], interval<double>[1, 2] ) = interval<double>[-inf, +inf];
+
+// -----------------------------------------------------------------------------
+// Recommended forward elementary functions on intervals, 
+// see P1788/D7.0 Sect. 9.7.1 Table 5
+// -----------------------------------------------------------------------------
+
+// TODO: noch nicht implementiert
+
+// -----------------------------------------------------------------------------
+// Recommended interval overlapping, see P1788/D7.0 Sect. 9.7.2
+// -----------------------------------------------------------------------------
+
+// TODO: noch nicht implementiert
+
+// -----------------------------------------------------------------------------
+// Recommended slope functions, see P1788/D7.0 Sect. 9.7.3 Table 7
+// -----------------------------------------------------------------------------
+
+// TODO: noch nicht implementiert

@@ -72,7 +72,6 @@ import de.uniwue.info2.generator.cases.ArithmeticLibrarySpecification;
 import de.uniwue.info2.generator.cases.LanguageSpecification;
 import de.uniwue.info2.generator.cases.UnitTestLibrarySpecification;
 import de.uniwue.info2.numerics.FloatingPoint;
-import de.uniwue.info2.numerics.prec.SinglePrecisionFloat;
 import de.uniwue.info2.operations.Endpoints;
 import de.uniwue.info2.operations.GenericParameter;
 import de.uniwue.info2.operations.Interval;
@@ -120,6 +119,7 @@ public class TestcaseGenerator {
 	private HashMap<Class<?>, String[]> currentPositiveInfinityTable_;
 	private HashMap<Class<?>, String[]> currentNegativeInfinityTable_;
 	private String[] currentEmptyIntervalTranslation_;
+	private String[] currentEntireIntervalTranslation_;
 
 	private String lineComment_;
 	private Boolean littleEndian_;
@@ -128,7 +128,7 @@ public class TestcaseGenerator {
 	private static final DecimalFormat INDEX = new DecimalFormat("00");
 
 	// name for testfunctions, at the end a counter is being added
-	private static final String TESTCASE = "testcase_";
+	private static final String TESTCASE = "test_";
 
 	/**
 	 * Generator for unit-tests.
@@ -203,6 +203,7 @@ public class TestcaseGenerator {
 				// add interval translation from arithmetic library
 				this.currentTypeTranslation_.put(Interval.class, aSpec.getIntervalTranslation());
 				this.currentEmptyIntervalTranslation_ = aSpec.getEmptyIntervalTranslation();
+				this.currentEntireIntervalTranslation_ = aSpec.getEntireIntervalTranslation();
 
 				// add all operation-translations
 				this.currentOperationsTranslationTable_ = aSpec.getOperationsTranslation();
@@ -211,7 +212,6 @@ public class TestcaseGenerator {
 				// add operations to get lower and upper limit from intervall
 				this.currentOperationsTranslationTable_.put("intervalLowerLimit", aSpec.getIntervalLowerLimit());
 				this.currentOperationsTranslationTable_.put("intervalUpperLimit", aSpec.getIntervalUpperLimit());
-				this.currentOperationsTranslationTable_.put("intervalIsEmpty", aSpec.checkIfIntervalEmptyTranslation());
 
 				// get main program code-sequence
 				this.currentBuild_ = this.currentLanguageSpecification_.getCodeSequence();
@@ -257,16 +257,14 @@ public class TestcaseGenerator {
 							|| (this.currentMixedTypesOperationsTranslationTable_.containsKey(operation.getName()) && mixed_types)) {
 
 						// check if recommended operations are marked for generation
-						// elaboate if block for more clarity 
-						boolean generateCurrentOp=false;
+						// elaboate if block for more clarity
+						boolean generateCurrentOp = false;
 						if (operation.isRequired()) {
-							generateCurrentOp=true;
-						}
-						else if (useOptionalOperations && !optionalExceptions.contains(operation.getName())) {
-							generateCurrentOp=true;
-						}
-						else if (!useOptionalOperations && optionalExceptions.contains(operation.getName())) {
-							generateCurrentOp=true;
+							generateCurrentOp = true;
+						} else if (useOptionalOperations && !optionalExceptions.contains(operation.getName())) {
+							generateCurrentOp = true;
+						} else if (!useOptionalOperations && optionalExceptions.contains(operation.getName())) {
+							generateCurrentOp = true;
 						}
 
 						if (generateCurrentOp) {
@@ -303,7 +301,6 @@ public class TestcaseGenerator {
 							// raw operation string by name
 							String function = "";
 
-
 							if (mixed_types) {
 								function = this.currentMixedTypesOperationsTranslationTable_.get(operation.getName());
 							} else {
@@ -318,44 +315,68 @@ public class TestcaseGenerator {
 							// declare all input parameter
 							for (int i = 0; i < input_parameter.size(); i++) {
 								GenericParameter<?> input = input_parameter.get(i);
-								String inputName = "input_" + INDEX.format(i + 1);
+
+								String inputName = "";
+								if (input_parameter.size() < 2) {
+									inputName = "input";
+								}
+								else {
+									inputName = "input_" + INDEX.format(i + 1);
+								}
 
 								// add to comment, that input parameter was
 								// defined
 								declarations += this.lineComment_ + " input parameter " + (i + 1) + ":" + "\n";
 								if (input.hasType(Interval.class)) {
 									Interval<?> interval = (Interval<?>) input.getValue();
-									if (!interval.isEmpty()) {
-										declarations += getNewIntervalString(interval, inputName, false);
-									} else {
-										declarations += getNewIntervalString(interval, inputName, true);
+
+									if (interval.isEmpty()) {
+										declarations += getNewIntervalString(interval, inputName, true, false);
 									}
+									else if (interval.isEntire()) {
+										declarations += getNewIntervalString(interval, inputName, false, true);
+									}
+									else {
+										declarations += getNewIntervalString(interval, inputName, false, false);
+									}
+
 								} else {
 									declarations += getParameterString(input, inputName);
 								}
 
 								if (function.contains(inputName(i + 1))) {
 									function = function.replace(inputName(i + 1), inputName);
-								}
-								else if (function.contains(VAR_ARGS)) {
+								} else if (function.contains(VAR_ARGS)) {
 									if (function.split(VAR_ARGS).length > 1) {
-										// TODO:
 										System.err.println("only one variable arguments parameter is possible");
-									}else {
-										var_arguments += aSpec.getParameterSeparator() + " "  + inputName; 
+									} else {
+										var_arguments += aSpec.getParameterSeparator() + " " + inputName;
 									}
 								}
 							}
 
 							if (!var_arguments.isEmpty()) {
-									function = function.replace(VAR_ARGS, var_arguments);
+								function = function.replace(VAR_ARGS, var_arguments);
+							} else {
+								function = function.replace(VAR_ARGS, "");
 							}
 
 							// declare all output parameter
 							for (int i = 0; i < output_parameter.size(); i++) {
 								GenericParameter<?> output = output_parameter.get(i);
-								String expectedOutputName = "output_" + INDEX.format(i + 1);
-								String outputName = "lib_output_" + INDEX.format(i + 1);
+
+								String expectedOutputName = "";
+								String outputName = "";
+
+								if (output_parameter.size() < 2) {
+									expectedOutputName = "output";
+									outputName = "lib_output";
+								}
+								else {
+									expectedOutputName = "output_" + INDEX.format(i + 1);
+									outputName = "lib_output_" + INDEX.format(i + 1);
+								}
+
 								String type = "";
 
 								// add to comment, that output parameter was
@@ -368,20 +389,29 @@ public class TestcaseGenerator {
 									// get type translation from current
 									// language-specification
 									type = this.currentTypeTranslation_.get(interval.getTypeClass())[0];
-									if (!interval.isEmpty()) {
-										declarations += getNewIntervalString(interval, expectedOutputName, false);
-									} else {
-										declarations += getNewIntervalString(interval, expectedOutputName, true);
+
+									if (interval.isEmpty()) {
+										declarations += getNewIntervalString(interval, expectedOutputName, true, false);
+									}
+									else if (interval.isEntire()) {
+										declarations += getNewIntervalString(interval, expectedOutputName, false, true);
+									}
+									else {
+										declarations += getNewIntervalString(interval, expectedOutputName, false, false);
 									}
 
 									// get interval translation from current
 									// arithmetic-library-specification
 									String intervalType = this.currentTypeTranslation_.get(((Interval<?>) output.getValue()).getTypeClass())[0];
-
-									if (!interval.isEmpty()) {
-										assertString += getAssertFunctionForInterval(intervalType, expectedOutputName, outputName, currentSetConfig, isNegated);
-									} else {
+									
+									if (interval.isEmpty()) {
 										assertString += getAssertFunctionForEmptyInterval(expectedOutputName, outputName, currentSetConfig, isNegated);
+									}
+									else if (interval.isEntire()) {
+										assertString += getAssertFunctionForEntireInterval(expectedOutputName, outputName, currentSetConfig, isNegated);
+									}
+									else {
+										assertString += getAssertFunctionForInterval(intervalType, expectedOutputName, outputName, currentSetConfig, isNegated);
 									}
 
 								} else {
@@ -416,9 +446,10 @@ public class TestcaseGenerator {
 				this.currentBuild_ = replacePlaceHolder(currentBuild_, DYNAMIC_TEST_METHODS, testMethods);
 
 				// build filename for current language specification
-				String outputFileName = (this.currentLanguageSpecification_.getOptionName() + "_" + this.currentArithmeticLibrary_.getOptionName()
-						+ "_" + this.currentUnitTestLibrary_.getOptionName()).toLowerCase().replace("^[a-z0-9_]", "_")
-						+ "." + this.currentLanguageSpecification_.getExtension();
+				String outputFileName = (this.currentLanguageSpecification_.getOptionName() + "_" + this.currentUnitTestLibrary_.getOptionName())
+						.toLowerCase().replace("^[a-z0-9_]", "_") + "_" + this.currentArithmeticLibrary_.getOptionName()
+
+				+ "." + this.currentLanguageSpecification_.getExtension();
 				File outputFile = new File(this.outputFolder_, outputFileName);
 
 				try {
@@ -463,7 +494,6 @@ public class TestcaseGenerator {
 		return false;
 	}
 
-
 	private boolean checkOperationForMixType(Operation operation) {
 		List<GenericParameter<?>> input = operation.getInputList();
 		List<GenericParameter<?>> output = operation.getOutputList();
@@ -474,20 +504,19 @@ public class TestcaseGenerator {
 			if (output.get(0).hasType(Interval.class)) {
 				Interval<?> interval = (Interval<?>) output.get(0).getValue();
 				if (!interval.hasType(this.currentMixedType)) {
-					throw new IllegalArgumentException("\nERROR: Operation with name: \"" + operation.getName() 
-							+ "\" was declared with mixed types,\nbut doesn't use the declared output-parameter-type: " 
-							+ this.currentMixedType.getSimpleName() + "\n");
+					throw new IllegalArgumentException("\nERROR: Operation with name: \"" + operation.getName()
+							+ "\" was declared with mixed types,\nbut doesn't use the declared output-parameter-type: " + this.currentMixedType.getSimpleName()
+							+ "\n");
 				}
-			}	
+			}
 		}
 
 		if (this.currentMixedType != null) {
 			if (!isMixedType) {
-				System.err.println("NOTICE: Operation with name: \"" + operation.getName() 
-							+ "\" was declared with mixed types,\nbut actually has no mixed types!\n" );
+				System.err.println("NOTICE: Operation with name: \"" + operation.getName()
+						+ "\" was declared with mixed types,\nbut actually has no mixed types!\n");
 			}
-		}
-		else {
+		} else {
 
 		}
 		return isMixedType;
@@ -508,7 +537,6 @@ public class TestcaseGenerator {
 		}
 		return false;
 	}
-
 
 	/**
 	 * Get blockcomment for given operation.
@@ -595,19 +623,16 @@ public class TestcaseGenerator {
 		if (negate) {
 			negate = !negate;
 			if (set == Set.PROPER_SUBSET) {
-				set = Set.SUPERSET; 
-			}
-			else if (set == Set.SUBSET) {
+				set = Set.SUPERSET;
+			} else if (set == Set.SUBSET) {
 				set = Set.PROPER_SUPERSET;
-			}
-			else if (set == Set.PROPER_SUPERSET) {
+			} else if (set == Set.PROPER_SUPERSET) {
 				set = Set.SUBSET;
-			}
-			else if (set == Set.SUPERSET) {
+			} else if (set == Set.SUPERSET) {
 				set = Set.PROPER_SUBSET;
 			}
 		}
-		
+
 		String lower_limit_test = getAssertString(first_lower_limit_name, second_lower_limit_name, set, negate);
 		if (set != null) {
 			negate = !negate;
@@ -632,11 +657,33 @@ public class TestcaseGenerator {
 		String bool_output = "bool_" + outputName;
 		String type = this.currentTypeTranslation_.get(Boolean.class)[0];
 
-		String first_lower_limit_def = currentOperationsTranslationTable_.get("intervalIsEmpty").replace(outputType(1), type)
+		String first_lower_limit_def = currentOperationsTranslationTable_.get("is_empty").replace(outputType(1), type)
 				.replace(outputName(1), bool_expected).replace(inputName(1), expectedOutputName);
-		String second_lower_limit_def = currentOperationsTranslationTable_.get("intervalIsEmpty").replace(outputType(1), type)
+		String second_lower_limit_def = currentOperationsTranslationTable_.get("is_empty").replace(outputType(1), type)
 				.replace(outputName(1), bool_output).replace(inputName(1), outputName);
+		String lower_limit_test = getAssertString(bool_expected, bool_output, set, negate);
 
+		return ("\n" + first_lower_limit_def + "\n" + second_lower_limit_def + "\n" + lower_limit_test + "\n");
+	}
+
+	/**
+	 * Assembles an assert function for an entire interval.
+	 *
+	 * @param expectedOutputName
+	 *         expected result
+	 * @param outputName
+	 *         actual result
+	 * @return assert-function as string
+	 */
+	private String getAssertFunctionForEntireInterval(String expectedOutputName, String outputName, Set set, boolean negate) {
+		String bool_expected = "bool_" + expectedOutputName;
+		String bool_output = "bool_" + outputName;
+		String type = this.currentTypeTranslation_.get(Boolean.class)[0];
+
+		String first_lower_limit_def = currentOperationsTranslationTable_.get("is_entire").replace(outputType(1), type)
+				.replace(outputName(1), bool_expected).replace(inputName(1), expectedOutputName);
+		String second_lower_limit_def = currentOperationsTranslationTable_.get("is_entire").replace(outputType(1), type)
+				.replace(outputName(1), bool_output).replace(inputName(1), outputName);
 		String lower_limit_test = getAssertString(bool_expected, bool_output, set, negate);
 
 		return ("\n" + first_lower_limit_def + "\n" + second_lower_limit_def + "\n" + lower_limit_test + "\n");
@@ -738,7 +785,7 @@ public class TestcaseGenerator {
 	 *         specifies, if interval is empty
 	 * @return interval string
 	 */
-	private String getNewIntervalString(Interval<?> interval, String name, boolean empty) {
+	private String getNewIntervalString(Interval<?> interval, String name, boolean empty, boolean entire) {
 		String declaration = "";
 
 		String inputType = currentTypeTranslation_.get(interval.getTypeClass())[0];
@@ -746,6 +793,13 @@ public class TestcaseGenerator {
 		if (empty) {
 			declaration += currentEmptyIntervalTranslation_[1];
 			declaration = declaration.replace(PARAM_TYPE, currentEmptyIntervalTranslation_[0]);
+			declaration = declaration.replace(INTERVAL_TYPE, inputType);
+			declaration = declaration.replace(INTERVAL_NAME, name) + "\n";
+			return declaration;
+		}
+		else if(entire) {
+			declaration += currentEntireIntervalTranslation_[1];
+			declaration = declaration.replace(PARAM_TYPE, currentEntireIntervalTranslation_[0]);
 			declaration = declaration.replace(INTERVAL_TYPE, inputType);
 			declaration = declaration.replace(INTERVAL_NAME, name) + "\n";
 			return declaration;

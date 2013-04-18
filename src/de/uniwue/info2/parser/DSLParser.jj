@@ -290,6 +290,7 @@ TOKEN_MGR_DECLS :
 	| < POSITIVE_INFINITY : "+inf" >
 	
 	| < EMPTY_SET : "empty" >
+	| < ENTIRE_SET : "entire" >
 	
 	// end of line
 	| < EOL : ";" >
@@ -358,14 +359,129 @@ void operation() :
 }
 {
   (
-		// posibile parameters
-		// interval(),  bool(), number()
+// posibile parameters
+// interval(),  bool(), number()
 
-		// name of operation
+// -----------------------------------------------------------------------------
+/// Non-arithmetic set operations, see P1788/D7.1 Sect. 9.6.7
+// -----------------------------------------------------------------------------
+  	operation = "intersect" 						 
+		input() interval() <SP> interval()
+		output() interval()
+  |
+  	operation = "hull" 						 
+		input() interval() <SP> interval()
+		output() interval()
+  |
+// -----------------------------------------------------------------------------
+// Numeric functions on intervals, see P1788/D7.1 Sect. 9.6.9
+// -----------------------------------------------------------------------------
+  	operation = "inf" 						 
+		input() interval()
+		output() number()
+  |
+  	operation = "sup" 						 
+		input() interval()
+		output() number()
+  |
+  	operation = "mid" 						 
+		input() interval()
+		output() number()
+  |
+  	operation = "rad" 						 
+		input() interval()
+		output() number()
+  |
+  	operation = "mid_rad" 						 
+		input() interval()
+		output() number() <SP> number()
+  |
+  	operation = "wid" 						 
+		input() interval()
+		output() number()
+  |
+  	operation = "mag" 						 
+		input() interval()
+		output() number()
+  |
+  	operation = "mig" 						 
+		input() interval()
+		output() number()
+  |
+
+// -----------------------------------------------------------------------------
+// Boolean functions on intervals, see P1788/D7.0 Sect. 9.6.10
+// -----------------------------------------------------------------------------
+  	operation = "is_empty" 						 
+		input() interval()
+		output() bool()
+  |
+  	operation = "is_entire" 						 
+		input() interval()
+		output() bool()
+  |
+  	operation = "is_equal" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "contained_in" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "contains" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "less" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "greater" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "precedes" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "succeeds" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "is_interior" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "contains_interior" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "strictly_less" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "strictly_greater" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "strictly_precedes" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "strictly_succeeds" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "are_disjoint" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+
+// -----------------------------------------------------------------------------
+// Forward elementary functions
+// -----------------------------------------------------------------------------
   	operation = "pos" 						
-		// input-parameter
 		input() interval()  
-		// output-parameter
 		output() interval()
   |
   	operation = "neg" 						 
@@ -527,7 +643,172 @@ void operation() :
 		operation = "max"
 		input() interval() (<SP> interval())+
 		output() interval()
-  )
+	|
+
+// -----------------------------------------------------------------------------
+// Reverse elementary functions, see P1788/D7.0 Sect. 9.6.5 Table 2
+// -----------------------------------------------------------------------------
+
+		operation = "sqr_rev"
+		input() interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "inv_rev"
+		input() interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "abs_rev"
+		input() interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "pown_rev"
+		input() interval() <SP> (interval() <SP>)?  number2()
+		output() interval()
+	|
+		operation = "sin_rev"
+		input() interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "cos_rev"
+		input() interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "tan_rev"
+		input() interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "cosh_rev"
+		input() interval() (<SP> interval())?
+		output() interval()
+	|
+
+// reverse versions of binary point functions
+
+		operation = "mul_rev"
+		input() interval() <SP> interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "div_rev1"
+		input() interval() <SP> interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "div_rev2"
+		input() interval() <SP> interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "pow_rev1"
+		input() interval() <SP> interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "pow_rev2"
+		input() interval() <SP> interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "atan2_rev1"
+		input() interval() <SP> interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "atan2_rev2"
+		input() interval() <SP> interval() (<SP> interval())?
+		output() interval()
+
+// -----------------------------------------------------------------------------
+// Cancellative addition and subtraction, see P1788/D7.0 Sect. 9.6.6
+// -----------------------------------------------------------------------------
+	|
+		operation = "cancel_plus"
+		input() interval() <SP> interval()  
+		output() interval()
+	|
+		operation = "cancel_minus"
+		input() interval() <SP> interval()  
+		output() interval()
+
+// -----------------------------------------------------------------------------
+// Recommended forward elementary functions on intervals, 
+// see P1788/D7.0 Sect. 9.7.1 Table 5
+// -----------------------------------------------------------------------------
+	|
+		operation = "rootn"
+		input() interval() <SP> number()  
+		output() interval()
+	|
+		operation = "expm1"
+		input() interval()  
+		output() interval()
+	|
+		operation = "exp2m1"
+		input() interval()  
+		output() interval()
+	|
+		operation = "exp10m1"
+		input() interval()  
+		output() interval()
+	|
+		operation = "logp1"
+		input() interval()  
+		output() interval()
+	|
+		operation = "log2p1"
+		input() interval()  
+		output() interval()
+	|
+		operation = "log10p1"
+		input() interval()  
+		output() interval()
+	|
+		operation = "compoundm1"
+		input() interval() <SP> interval() 
+		output() interval()
+	|
+		operation = "hypot"
+		input() interval() <SP> interval() 
+		output() interval()
+	|
+		operation = "r_sqrt"
+		input() interval() 
+		output() interval()
+	|
+		operation = "sin_pi"
+		input() interval() 
+		output() interval()
+	|
+		operation = "cos_pi"
+		input() interval() 
+		output() interval()
+	|
+		operation = "tan_pi"
+		input() interval() 
+		output() interval()
+	|
+		operation = "asin_pi"
+		input() interval() 
+		output() interval()
+	|
+		operation = "acos_pi"
+		input() interval() 
+		output() interval()
+	|
+		operation = "atan_pi"
+		input() interval() 
+		output() interval()
+	|
+		operation = "atan2_pi"
+		input() interval() <SP> interval()
+		output() interval()
+
+// -----------------------------------------------------------------------------
+// Recommended interval overlapping, see P1788/D7.0 Sect. 9.7.2
+// -----------------------------------------------------------------------------
+
+
+// -----------------------------------------------------------------------------
+// Recommended slope functions, see P1788/D7.0 Sect. 9.7.3 Table 7
+// -----------------------------------------------------------------------------
+
+)
+
+
   
   < EOL >
   {
@@ -912,6 +1193,7 @@ void bool() :
 	)
 }
 
+
 void number() :
 {
 	GenericParameter <?> variable = null;
@@ -935,6 +1217,16 @@ void number() :
 	 		}
  		}
 	)
+}
+
+void number2() :
+{
+	GenericParameter <?> variable = null;
+}
+{
+	floatingPoint()
+	|
+	integer()
 }
 
 
@@ -1037,6 +1329,9 @@ Interval<?> getIntervalParameter() :
 			|
 			< EMPTY_SET >
 			{ intervalFloat.emptyInterval(); }
+			|
+			< ENTIRE_SET >
+			{ intervalFloat.setEntireInterval(); }
 		)
 		< CLOSE_INTERVAL_VARS >
 		{ return intervalFloat; }
@@ -1063,6 +1358,9 @@ Interval<?> getIntervalParameter() :
 			|
 			< EMPTY_SET >
 			{ intervalFloat.emptyInterval(); }
+			|
+			< ENTIRE_SET >
+			{ intervalFloat.setEntireInterval(); }
 		)
 		< CLOSE_INTERVAL_VARS >
 		{ return intervalFloat; }
@@ -1089,6 +1387,9 @@ Interval<?> getIntervalParameter() :
 			|
 			< EMPTY_SET >
 			{ intervalFloat.emptyInterval(); }
+			|
+			< ENTIRE_SET >
+			{ intervalFloat.setEntireInterval(); }
 		)
 		< CLOSE_INTERVAL_VARS >
 		{ return intervalInteger; }
@@ -1115,6 +1416,9 @@ Interval<?> getIntervalParameter() :
 			|
 			< EMPTY_SET >
 			{ intervalFloat.emptyInterval(); }		)
+			|
+			< ENTIRE_SET >
+			{ intervalFloat.setEntireInterval(); }
 		< CLOSE_INTERVAL_VARS >
 		{ return intervalInteger; }
 	)
@@ -1140,6 +1444,9 @@ Interval<?> getIntervalParameter() :
 			|
 			< EMPTY_SET >
 			{ intervalFloat.emptyInterval(); }
+			|
+			< ENTIRE_SET >
+			{ intervalFloat.setEntireInterval(); }
 		)
 		< CLOSE_INTERVAL_VARS >
 		{ return intervalInteger; }

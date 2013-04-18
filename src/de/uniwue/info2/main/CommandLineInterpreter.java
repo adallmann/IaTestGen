@@ -333,9 +333,9 @@ public class CommandLineInterpreter {
 						return;
 					}
 				}
-				String exceptions = optional_operations.getProperty("EXCEPTIONS"); 
+				String exceptions = optional_operations.getProperty("EXCLUSIONS"); 
 				if (exceptions != null) {
-					for (String exc : optional_operations.getProperty("EXCEPTIONS").split(";")) {
+					for (String exc : optional_operations.getProperty("EXCLUSIONS").split(";")) {
 						optional_exceptions.add(exc.trim());
 					}
 				}
@@ -359,6 +359,7 @@ public class CommandLineInterpreter {
 					LanguageSpecification targetSpecification = languageFactory.getLanguageSpecification(options.getOption(opt).getLongOpt());
 					String output = (GENERATING_DIALOG + targetSpecification.getLanguageName());
 
+
 					// finally generate unit-test for current language-specification
 					boolean successful = mainGenerator.generateUnitTest(targetSpecification, optional, optional_exceptions, little_endian);
 
@@ -370,6 +371,7 @@ public class CommandLineInterpreter {
 					overrideDefaultSpecs = true;
 				}
 			}
+
 
 			// skip, if user already defined one language-specification
 			// if user did not define language-specification, generate unit-tests for all

@@ -114,11 +114,11 @@ public class CppSpecification extends LanguageSpecification {
 		types.put(Boolean.class, translation);
 		
 		translation = new String[] { "float",
-				TYPE + " " + NAME + " = " + "hexStringToFloat(\"" + VALUE + "\");" };
+				TYPE + " " + NAME + " = " + "hex_string_to_float(\"" + VALUE + "\");" };
 		types.put(SinglePrecisionFloat.class, translation);
 
 		translation = new String[] { "double",
-				TYPE + " " + NAME + " = " + "hexStringToDouble(\"" + VALUE + "\");" };
+				TYPE + " " + NAME + " = " + "hex_string_to_double(\"" + VALUE + "\");" };
 		types.put(DoublePrecisionFloat.class, translation);
 		return types;
 	}
@@ -139,7 +139,7 @@ public class CppSpecification extends LanguageSpecification {
 
 		buffer.append("\n\n// Hex to Float Conversion\n");
 		buffer.append("const unsigned float_length = sizeof(float);\n");
-		buffer.append("float hexStringToFloat(std::string hexStr) {\n");
+		buffer.append("float hex_string_to_float(std::string hexStr) {\n");
 		buffer.append("\tunsigned char temp[float_length];\n");
 		buffer.append("\tstd::string searchString(\"0x\");\n");
 		buffer.append("\tstd::string::size_type pos = 0;\n");
@@ -157,8 +157,8 @@ public class CppSpecification extends LanguageSpecification {
 
 
 		buffer.append("// Hex to Double Conversion\n");
-		buffer.append("unsigned double_length = sizeof(double);\n");
-		buffer.append("double hexStringToDouble(std::string hexStr) {\n");
+		buffer.append("const unsigned double_length = sizeof(double);\n");
+		buffer.append("double hex_string_to_double(std::string hexStr) {\n");
 		buffer.append("\tunsigned char temp[double_length];\n");
 		buffer.append("\tstd::string searchString(\"0x\");\n");
 		buffer.append("\tstd::string::size_type pos = 0;\n");

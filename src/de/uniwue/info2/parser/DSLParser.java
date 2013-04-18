@@ -140,7 +140,6 @@ public class DSLParser implements DSLParserConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case BEGIN_BLOCK_COMMENT:
       case VARIABLE_NAME:
-      case 52:
       case 53:
       case 54:
       case 55:
@@ -181,6 +180,67 @@ public class DSLParser implements DSLParserConstants {
       case 90:
       case 91:
       case 92:
+      case 93:
+      case 94:
+      case 95:
+      case 96:
+      case 97:
+      case 98:
+      case 99:
+      case 100:
+      case 101:
+      case 102:
+      case 103:
+      case 104:
+      case 105:
+      case 106:
+      case 107:
+      case 108:
+      case 109:
+      case 110:
+      case 111:
+      case 112:
+      case 113:
+      case 114:
+      case 115:
+      case 116:
+      case 117:
+      case 118:
+      case 119:
+      case 120:
+      case 121:
+      case 122:
+      case 123:
+      case 124:
+      case 125:
+      case 126:
+      case 127:
+      case 128:
+      case 129:
+      case 130:
+      case 131:
+      case 132:
+      case 133:
+      case 134:
+      case 135:
+      case 136:
+      case 137:
+      case 138:
+      case 139:
+      case 140:
+      case 141:
+      case 142:
+      case 143:
+      case 144:
+      case 145:
+      case 146:
+      case 147:
+      case 148:
+      case 149:
+      case 150:
+      case 151:
+      case 152:
+      case 153:
         ;
         break;
       default:
@@ -194,7 +254,6 @@ public class DSLParser implements DSLParserConstants {
       case VARIABLE_NAME:
         variable();
         break;
-      case 52:
       case 53:
       case 54:
       case 55:
@@ -235,6 +294,67 @@ public class DSLParser implements DSLParserConstants {
       case 90:
       case 91:
       case 92:
+      case 93:
+      case 94:
+      case 95:
+      case 96:
+      case 97:
+      case 98:
+      case 99:
+      case 100:
+      case 101:
+      case 102:
+      case 103:
+      case 104:
+      case 105:
+      case 106:
+      case 107:
+      case 108:
+      case 109:
+      case 110:
+      case 111:
+      case 112:
+      case 113:
+      case 114:
+      case 115:
+      case 116:
+      case 117:
+      case 118:
+      case 119:
+      case 120:
+      case 121:
+      case 122:
+      case 123:
+      case 124:
+      case 125:
+      case 126:
+      case 127:
+      case 128:
+      case 129:
+      case 130:
+      case 131:
+      case 132:
+      case 133:
+      case 134:
+      case 135:
+      case 136:
+      case 137:
+      case 138:
+      case 139:
+      case 140:
+      case 141:
+      case 142:
+      case 143:
+      case 144:
+      case 145:
+      case 146:
+      case 147:
+      case 148:
+      case 149:
+      case 150:
+      case 151:
+      case 152:
+      case 153:
         operation();
         break;
       default:
@@ -257,20 +377,17 @@ public class DSLParser implements DSLParserConstants {
   this.currentOperation_.setRequired(this.currentOperationRequired_);
   this.currentOperationInputMode_ = true;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case 52:
-      // posibile parameters
-                      // interval(),  bool(), number()
-      
-                      // name of operation
-              operation = jj_consume_token(52);
-      input();
-      interval();
-      output();
-      interval();
-      break;
     case 53:
-      operation = jj_consume_token(53);
+      // posibile parameters
+      // interval(),  bool(), number()
+      
+      // -----------------------------------------------------------------------------
+      /// Non-arithmetic set operations, see P1788/D7.1 Sect. 9.6.7
+      // -----------------------------------------------------------------------------
+              operation = jj_consume_token(53);
       input();
+      interval();
+      jj_consume_token(SP);
       interval();
       output();
       interval();
@@ -285,176 +402,190 @@ public class DSLParser implements DSLParserConstants {
       interval();
       break;
     case 55:
-      operation = jj_consume_token(55);
+      // -----------------------------------------------------------------------------
+      // Numeric functions on intervals, see P1788/D7.1 Sect. 9.6.9
+      // -----------------------------------------------------------------------------
+              operation = jj_consume_token(55);
       input();
       interval();
-      jj_consume_token(SP);
-      interval();
       output();
-      interval();
+      number();
       break;
     case 56:
       operation = jj_consume_token(56);
       input();
       interval();
-      jj_consume_token(SP);
-      interval();
       output();
-      interval();
+      number();
       break;
     case 57:
       operation = jj_consume_token(57);
       input();
       interval();
-      jj_consume_token(SP);
-      interval();
       output();
-      interval();
+      number();
       break;
     case 58:
       operation = jj_consume_token(58);
       input();
       interval();
       output();
-      interval();
+      number();
       break;
     case 59:
       operation = jj_consume_token(59);
       input();
       interval();
       output();
-      interval();
+      number();
+      jj_consume_token(SP);
+      number();
       break;
     case 60:
       operation = jj_consume_token(60);
       input();
       interval();
-      jj_consume_token(SP);
-      interval();
-      jj_consume_token(SP);
-      interval();
       output();
-      interval();
+      number();
       break;
     case 61:
       operation = jj_consume_token(61);
       input();
       interval();
-      jj_consume_token(SP);
-      interval();
-      jj_consume_token(SP);
-      interval();
       output();
-      interval();
+      number();
       break;
     case 62:
       operation = jj_consume_token(62);
       input();
       interval();
       output();
-      interval();
+      number();
       break;
     case 63:
-      operation = jj_consume_token(63);
+      // -----------------------------------------------------------------------------
+      // Boolean functions on intervals, see P1788/D7.0 Sect. 9.6.10
+      // -----------------------------------------------------------------------------
+              operation = jj_consume_token(63);
       input();
       interval();
-      jj_consume_token(SP);
-      number();
       output();
-      interval();
+      bool();
       break;
     case 64:
       operation = jj_consume_token(64);
       input();
       interval();
-      jj_consume_token(SP);
-      interval();
       output();
-      interval();
+      bool();
       break;
     case 65:
       operation = jj_consume_token(65);
       input();
       interval();
-      output();
+      jj_consume_token(SP);
       interval();
+      output();
+      bool();
       break;
     case 66:
       operation = jj_consume_token(66);
       input();
       interval();
-      output();
+      jj_consume_token(SP);
       interval();
+      output();
+      bool();
       break;
     case 67:
       operation = jj_consume_token(67);
       input();
       interval();
-      output();
+      jj_consume_token(SP);
       interval();
+      output();
+      bool();
       break;
     case 68:
       operation = jj_consume_token(68);
       input();
       interval();
-      output();
+      jj_consume_token(SP);
       interval();
+      output();
+      bool();
       break;
     case 69:
       operation = jj_consume_token(69);
       input();
       interval();
-      output();
+      jj_consume_token(SP);
       interval();
+      output();
+      bool();
       break;
     case 70:
       operation = jj_consume_token(70);
       input();
       interval();
-      output();
+      jj_consume_token(SP);
       interval();
+      output();
+      bool();
       break;
     case 71:
       operation = jj_consume_token(71);
       input();
       interval();
-      output();
+      jj_consume_token(SP);
       interval();
+      output();
+      bool();
       break;
     case 72:
       operation = jj_consume_token(72);
       input();
       interval();
-      output();
+      jj_consume_token(SP);
       interval();
+      output();
+      bool();
       break;
     case 73:
       operation = jj_consume_token(73);
       input();
       interval();
-      output();
+      jj_consume_token(SP);
       interval();
+      output();
+      bool();
       break;
     case 74:
       operation = jj_consume_token(74);
       input();
       interval();
-      output();
+      jj_consume_token(SP);
       interval();
+      output();
+      bool();
       break;
     case 75:
       operation = jj_consume_token(75);
       input();
       interval();
-      output();
+      jj_consume_token(SP);
       interval();
+      output();
+      bool();
       break;
     case 76:
       operation = jj_consume_token(76);
       input();
       interval();
-      output();
+      jj_consume_token(SP);
       interval();
+      output();
+      bool();
       break;
     case 77:
       operation = jj_consume_token(77);
@@ -463,17 +594,22 @@ public class DSLParser implements DSLParserConstants {
       jj_consume_token(SP);
       interval();
       output();
-      interval();
+      bool();
       break;
     case 78:
       operation = jj_consume_token(78);
       input();
       interval();
-      output();
+      jj_consume_token(SP);
       interval();
+      output();
+      bool();
       break;
     case 79:
-      operation = jj_consume_token(79);
+      // -----------------------------------------------------------------------------
+      // Forward elementary functions
+      // -----------------------------------------------------------------------------
+              operation = jj_consume_token(79);
       input();
       interval();
       output();
@@ -490,12 +626,16 @@ public class DSLParser implements DSLParserConstants {
       operation = jj_consume_token(81);
       input();
       interval();
+      jj_consume_token(SP);
+      interval();
       output();
       interval();
       break;
     case 82:
       operation = jj_consume_token(82);
       input();
+      interval();
+      jj_consume_token(SP);
       interval();
       output();
       interval();
@@ -504,12 +644,16 @@ public class DSLParser implements DSLParserConstants {
       operation = jj_consume_token(83);
       input();
       interval();
+      jj_consume_token(SP);
+      interval();
       output();
       interval();
       break;
     case 84:
       operation = jj_consume_token(84);
       input();
+      interval();
+      jj_consume_token(SP);
       interval();
       output();
       interval();
@@ -532,12 +676,20 @@ public class DSLParser implements DSLParserConstants {
       operation = jj_consume_token(87);
       input();
       interval();
+      jj_consume_token(SP);
+      interval();
+      jj_consume_token(SP);
+      interval();
       output();
       interval();
       break;
     case 88:
       operation = jj_consume_token(88);
       input();
+      interval();
+      jj_consume_token(SP);
+      interval();
+      jj_consume_token(SP);
       interval();
       output();
       interval();
@@ -553,11 +705,206 @@ public class DSLParser implements DSLParserConstants {
       operation = jj_consume_token(90);
       input();
       interval();
+      jj_consume_token(SP);
+      number();
       output();
       interval();
       break;
     case 91:
       operation = jj_consume_token(91);
+      input();
+      interval();
+      jj_consume_token(SP);
+      interval();
+      output();
+      interval();
+      break;
+    case 92:
+      operation = jj_consume_token(92);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 93:
+      operation = jj_consume_token(93);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 94:
+      operation = jj_consume_token(94);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 95:
+      operation = jj_consume_token(95);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 96:
+      operation = jj_consume_token(96);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 97:
+      operation = jj_consume_token(97);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 98:
+      operation = jj_consume_token(98);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 99:
+      operation = jj_consume_token(99);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 100:
+      operation = jj_consume_token(100);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 101:
+      operation = jj_consume_token(101);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 102:
+      operation = jj_consume_token(102);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 103:
+      operation = jj_consume_token(103);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 104:
+      operation = jj_consume_token(104);
+      input();
+      interval();
+      jj_consume_token(SP);
+      interval();
+      output();
+      interval();
+      break;
+    case 105:
+      operation = jj_consume_token(105);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 106:
+      operation = jj_consume_token(106);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 107:
+      operation = jj_consume_token(107);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 108:
+      operation = jj_consume_token(108);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 109:
+      operation = jj_consume_token(109);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 110:
+      operation = jj_consume_token(110);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 111:
+      operation = jj_consume_token(111);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 112:
+      operation = jj_consume_token(112);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 113:
+      operation = jj_consume_token(113);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 114:
+      operation = jj_consume_token(114);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 115:
+      operation = jj_consume_token(115);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 116:
+      operation = jj_consume_token(116);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 117:
+      operation = jj_consume_token(117);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 118:
+      operation = jj_consume_token(118);
       input();
       interval();
       label_2:
@@ -576,8 +923,8 @@ public class DSLParser implements DSLParserConstants {
       output();
       interval();
       break;
-    case 92:
-      operation = jj_consume_token(92);
+    case 119:
+      operation = jj_consume_token(119);
       input();
       interval();
       label_3:
@@ -596,8 +943,416 @@ public class DSLParser implements DSLParserConstants {
       output();
       interval();
       break;
+    case 120:
+      // -----------------------------------------------------------------------------
+      // Reverse elementary functions, see P1788/D7.0 Sect. 9.6.5 Table 2
+      // -----------------------------------------------------------------------------
+      
+                      operation = jj_consume_token(120);
+      input();
+      interval();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SP:
+        jj_consume_token(SP);
+        interval();
+        break;
+      default:
+        jj_la1[4] = jj_gen;
+        ;
+      }
+      output();
+      interval();
+      break;
+    case 121:
+      operation = jj_consume_token(121);
+      input();
+      interval();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SP:
+        jj_consume_token(SP);
+        interval();
+        break;
+      default:
+        jj_la1[5] = jj_gen;
+        ;
+      }
+      output();
+      interval();
+      break;
+    case 122:
+      operation = jj_consume_token(122);
+      input();
+      interval();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SP:
+        jj_consume_token(SP);
+        interval();
+        break;
+      default:
+        jj_la1[6] = jj_gen;
+        ;
+      }
+      output();
+      interval();
+      break;
+    case 123:
+      operation = jj_consume_token(123);
+      input();
+      interval();
+      jj_consume_token(SP);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case VARIABLE_NAME:
+      case INTERVAL:
+        interval();
+        jj_consume_token(SP);
+        break;
+      default:
+        jj_la1[7] = jj_gen;
+        ;
+      }
+      number2();
+      output();
+      interval();
+      break;
+    case 124:
+      operation = jj_consume_token(124);
+      input();
+      interval();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SP:
+        jj_consume_token(SP);
+        interval();
+        break;
+      default:
+        jj_la1[8] = jj_gen;
+        ;
+      }
+      output();
+      interval();
+      break;
+    case 125:
+      operation = jj_consume_token(125);
+      input();
+      interval();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SP:
+        jj_consume_token(SP);
+        interval();
+        break;
+      default:
+        jj_la1[9] = jj_gen;
+        ;
+      }
+      output();
+      interval();
+      break;
+    case 126:
+      operation = jj_consume_token(126);
+      input();
+      interval();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SP:
+        jj_consume_token(SP);
+        interval();
+        break;
+      default:
+        jj_la1[10] = jj_gen;
+        ;
+      }
+      output();
+      interval();
+      break;
+    case 127:
+      operation = jj_consume_token(127);
+      input();
+      interval();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SP:
+        jj_consume_token(SP);
+        interval();
+        break;
+      default:
+        jj_la1[11] = jj_gen;
+        ;
+      }
+      output();
+      interval();
+      break;
+    case 128:
+      // reverse versions of binary point functions
+      
+                      operation = jj_consume_token(128);
+      input();
+      interval();
+      jj_consume_token(SP);
+      interval();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SP:
+        jj_consume_token(SP);
+        interval();
+        break;
+      default:
+        jj_la1[12] = jj_gen;
+        ;
+      }
+      output();
+      interval();
+      break;
+    case 129:
+      operation = jj_consume_token(129);
+      input();
+      interval();
+      jj_consume_token(SP);
+      interval();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SP:
+        jj_consume_token(SP);
+        interval();
+        break;
+      default:
+        jj_la1[13] = jj_gen;
+        ;
+      }
+      output();
+      interval();
+      break;
+    case 130:
+      operation = jj_consume_token(130);
+      input();
+      interval();
+      jj_consume_token(SP);
+      interval();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SP:
+        jj_consume_token(SP);
+        interval();
+        break;
+      default:
+        jj_la1[14] = jj_gen;
+        ;
+      }
+      output();
+      interval();
+      break;
+    case 131:
+      operation = jj_consume_token(131);
+      input();
+      interval();
+      jj_consume_token(SP);
+      interval();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SP:
+        jj_consume_token(SP);
+        interval();
+        break;
+      default:
+        jj_la1[15] = jj_gen;
+        ;
+      }
+      output();
+      interval();
+      break;
+    case 132:
+      operation = jj_consume_token(132);
+      input();
+      interval();
+      jj_consume_token(SP);
+      interval();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SP:
+        jj_consume_token(SP);
+        interval();
+        break;
+      default:
+        jj_la1[16] = jj_gen;
+        ;
+      }
+      output();
+      interval();
+      break;
+    case 133:
+      operation = jj_consume_token(133);
+      input();
+      interval();
+      jj_consume_token(SP);
+      interval();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SP:
+        jj_consume_token(SP);
+        interval();
+        break;
+      default:
+        jj_la1[17] = jj_gen;
+        ;
+      }
+      output();
+      interval();
+      break;
+    case 134:
+      operation = jj_consume_token(134);
+      input();
+      interval();
+      jj_consume_token(SP);
+      interval();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SP:
+        jj_consume_token(SP);
+        interval();
+        break;
+      default:
+        jj_la1[18] = jj_gen;
+        ;
+      }
+      output();
+      interval();
+      break;
+    case 135:
+      operation = jj_consume_token(135);
+      input();
+      interval();
+      jj_consume_token(SP);
+      interval();
+      output();
+      interval();
+      break;
+    case 136:
+      operation = jj_consume_token(136);
+      input();
+      interval();
+      jj_consume_token(SP);
+      interval();
+      output();
+      interval();
+      break;
+    case 137:
+      operation = jj_consume_token(137);
+      input();
+      interval();
+      jj_consume_token(SP);
+      number();
+      output();
+      interval();
+      break;
+    case 138:
+      operation = jj_consume_token(138);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 139:
+      operation = jj_consume_token(139);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 140:
+      operation = jj_consume_token(140);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 141:
+      operation = jj_consume_token(141);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 142:
+      operation = jj_consume_token(142);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 143:
+      operation = jj_consume_token(143);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 144:
+      operation = jj_consume_token(144);
+      input();
+      interval();
+      jj_consume_token(SP);
+      interval();
+      output();
+      interval();
+      break;
+    case 145:
+      operation = jj_consume_token(145);
+      input();
+      interval();
+      jj_consume_token(SP);
+      interval();
+      output();
+      interval();
+      break;
+    case 146:
+      operation = jj_consume_token(146);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 147:
+      operation = jj_consume_token(147);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 148:
+      operation = jj_consume_token(148);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 149:
+      operation = jj_consume_token(149);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 150:
+      operation = jj_consume_token(150);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 151:
+      operation = jj_consume_token(151);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 152:
+      operation = jj_consume_token(152);
+      input();
+      interval();
+      output();
+      interval();
+      break;
+    case 153:
+      operation = jj_consume_token(153);
+      input();
+      interval();
+      jj_consume_token(SP);
+      interval();
+      output();
+      interval();
+      break;
     default:
-      jj_la1[4] = jj_gen;
+      jj_la1[19] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -624,7 +1379,7 @@ public class DSLParser implements DSLParserConstants {
       relationOperator();
       break;
     default:
-      jj_la1[5] = jj_gen;
+      jj_la1[20] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -652,7 +1407,7 @@ public class DSLParser implements DSLParserConstants {
                   this.currentOperation_.setSetRelation(Set.PROPER_SUPERSET);
       break;
     default:
-      jj_la1[6] = jj_gen;
+      jj_la1[21] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -671,7 +1426,7 @@ public class DSLParser implements DSLParserConstants {
         ;
         break;
       default:
-        jj_la1[7] = jj_gen;
+        jj_la1[22] = jj_gen;
         break label_4;
       }
       commentTag(false);
@@ -690,7 +1445,7 @@ public class DSLParser implements DSLParserConstants {
         ;
         break;
       default:
-        jj_la1[8] = jj_gen;
+        jj_la1[23] = jj_gen;
         break label_5;
       }
       commentTag(true);
@@ -737,7 +1492,7 @@ public class DSLParser implements DSLParserConstants {
                 }
       break;
     default:
-      jj_la1[9] = jj_gen;
+      jj_la1[24] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -754,7 +1509,7 @@ public class DSLParser implements DSLParserConstants {
       jj_consume_token(OPEN_PAR_LIST);
       break;
     default:
-      jj_la1[10] = jj_gen;
+      jj_la1[25] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -789,7 +1544,7 @@ public class DSLParser implements DSLParserConstants {
                                                   this.currentOperation_.setMixedTypeOutput(Long.class);
         break;
       default:
-        jj_la1[11] = jj_gen;
+        jj_la1[26] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -822,13 +1577,13 @@ public class DSLParser implements DSLParserConstants {
                           this.currentOperation_.setMixedTypeOutput(Long.class);
         break;
       default:
-        jj_la1[12] = jj_gen;
+        jj_la1[27] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
       break;
     default:
-      jj_la1[13] = jj_gen;
+      jj_la1[28] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -937,7 +1692,7 @@ public class DSLParser implements DSLParserConstants {
         jj_consume_token(PRIMITIVE_PAR_SEP);
         break;
       default:
-        jj_la1[14] = jj_gen;
+        jj_la1[29] = jj_gen;
         ;
       }
       boolParam = getBoolValue();
@@ -953,7 +1708,7 @@ public class DSLParser implements DSLParserConstants {
           {if (true) return new GenericParameter<Endpoints>(infinityParam);}
       break;
     default:
-      jj_la1[15] = jj_gen;
+      jj_la1[30] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -971,7 +1726,7 @@ public class DSLParser implements DSLParserConstants {
           {if (true) return Endpoints.POSITIVE_INFINITY;}
       break;
     default:
-      jj_la1[16] = jj_gen;
+      jj_la1[31] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -989,7 +1744,7 @@ public class DSLParser implements DSLParserConstants {
                                                           {if (true) return true;}
       break;
     default:
-      jj_la1[17] = jj_gen;
+      jj_la1[32] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1012,7 +1767,7 @@ public class DSLParser implements DSLParserConstants {
       value = jj_consume_token(DIGITS_FLOAT);
       break;
     default:
-      jj_la1[18] = jj_gen;
+      jj_la1[33] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1036,7 +1791,7 @@ public class DSLParser implements DSLParserConstants {
       value = jj_consume_token(DIGITS_FLOAT);
       break;
     default:
-      jj_la1[19] = jj_gen;
+      jj_la1[34] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1087,7 +1842,7 @@ public class DSLParser implements DSLParserConstants {
                         }
       break;
     default:
-      jj_la1[20] = jj_gen;
+      jj_la1[35] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1118,7 +1873,26 @@ public class DSLParser implements DSLParserConstants {
                         }
       break;
     default:
-      jj_la1[21] = jj_gen;
+      jj_la1[36] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+  }
+
+  final public void number2() throws ParseException {
+        GenericParameter <?> variable = null;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case FLOAT:
+    case DOUBLE:
+      floatingPoint();
+      break;
+    case SHORT:
+    case INTEGER:
+    case LONG:
+      integer();
+      break;
+    default:
+      jj_la1[37] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1139,7 +1913,7 @@ public class DSLParser implements DSLParserConstants {
       addParameterToFunction(new GenericParameter<FloatingPoint> (fp));
       break;
     default:
-      jj_la1[22] = jj_gen;
+      jj_la1[38] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1164,7 +1938,7 @@ public class DSLParser implements DSLParserConstants {
       num = getLongValue();
       break;
     default:
-      jj_la1[23] = jj_gen;
+      jj_la1[39] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1191,7 +1965,7 @@ public class DSLParser implements DSLParserConstants {
                 }
       break;
     default:
-      jj_la1[24] = jj_gen;
+      jj_la1[40] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1245,7 +2019,7 @@ public class DSLParser implements DSLParserConstants {
           handleEndpointsAndVariablesForFloat(intervalFloat, true);
           break;
         default:
-          jj_la1[25] = jj_gen;
+          jj_la1[41] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1264,7 +2038,7 @@ public class DSLParser implements DSLParserConstants {
           handleEndpointsAndVariablesForFloat(intervalFloat, false);
           break;
         default:
-          jj_la1[26] = jj_gen;
+          jj_la1[42] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1273,8 +2047,12 @@ public class DSLParser implements DSLParserConstants {
         jj_consume_token(EMPTY_SET);
                           intervalFloat.emptyInterval();
         break;
+      case ENTIRE_SET:
+        jj_consume_token(ENTIRE_SET);
+                          intervalFloat.setEntireInterval();
+        break;
       default:
-        jj_la1[27] = jj_gen;
+        jj_la1[43] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1308,7 +2086,7 @@ public class DSLParser implements DSLParserConstants {
           handleEndpointsAndVariablesForFloat(intervalFloat, true);
           break;
         default:
-          jj_la1[28] = jj_gen;
+          jj_la1[44] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1327,7 +2105,7 @@ public class DSLParser implements DSLParserConstants {
           handleEndpointsAndVariablesForFloat(intervalFloat, false);
           break;
         default:
-          jj_la1[29] = jj_gen;
+          jj_la1[45] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1336,8 +2114,12 @@ public class DSLParser implements DSLParserConstants {
         jj_consume_token(EMPTY_SET);
                           intervalFloat.emptyInterval();
         break;
+      case ENTIRE_SET:
+        jj_consume_token(ENTIRE_SET);
+                          intervalFloat.setEntireInterval();
+        break;
       default:
-        jj_la1[30] = jj_gen;
+        jj_la1[46] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1365,7 +2147,7 @@ public class DSLParser implements DSLParserConstants {
           handleEndpointsAndVariablesForInteger(intervalInteger, true);
           break;
         default:
-          jj_la1[31] = jj_gen;
+          jj_la1[47] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1381,7 +2163,7 @@ public class DSLParser implements DSLParserConstants {
           handleEndpointsAndVariablesForInteger(intervalInteger, false);
           break;
         default:
-          jj_la1[32] = jj_gen;
+          jj_la1[48] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1390,8 +2172,12 @@ public class DSLParser implements DSLParserConstants {
         jj_consume_token(EMPTY_SET);
                           intervalFloat.emptyInterval();
         break;
+      case ENTIRE_SET:
+        jj_consume_token(ENTIRE_SET);
+                          intervalFloat.setEntireInterval();
+        break;
       default:
-        jj_la1[33] = jj_gen;
+        jj_la1[49] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1399,58 +2185,71 @@ public class DSLParser implements DSLParserConstants {
                   {if (true) return intervalInteger;}
       break;
     case INTEGER:
-      jj_consume_token(INTEGER);
-      jj_consume_token(CLOSE_TYPE);
-      jj_consume_token(OPEN_INTERVAL_VARS);
-                  intervalInteger.specifySubclass(Integer.class);
+    case ENTIRE_SET:
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case VARIABLE_NAME:
-      case DIGITS_INTEGER:
-      case NEGATIVE_INFINITY:
-      case POSITIVE_INFINITY:
+      case INTEGER:
+        jj_consume_token(INTEGER);
+        jj_consume_token(CLOSE_TYPE);
+        jj_consume_token(OPEN_INTERVAL_VARS);
+                  intervalInteger.specifySubclass(Integer.class);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case VARIABLE_NAME:
         case DIGITS_INTEGER:
-          integerValue = getIntegerValue();
+        case NEGATIVE_INFINITY:
+        case POSITIVE_INFINITY:
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case DIGITS_INTEGER:
+            integerValue = getIntegerValue();
                                   intervalInteger.setLower_limit(integerValue);
-          break;
-        case VARIABLE_NAME:
-        case NEGATIVE_INFINITY:
-        case POSITIVE_INFINITY:
-          handleEndpointsAndVariablesForInteger(intervalInteger, true);
-          break;
-        default:
-          jj_la1[34] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
-        }
-        jj_consume_token(SP);
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case DIGITS_INTEGER:
-          integerValue = getIntegerValue();
+            break;
+          case VARIABLE_NAME:
+          case NEGATIVE_INFINITY:
+          case POSITIVE_INFINITY:
+            handleEndpointsAndVariablesForInteger(intervalInteger, true);
+            break;
+          default:
+            jj_la1[50] = jj_gen;
+            jj_consume_token(-1);
+            throw new ParseException();
+          }
+          jj_consume_token(SP);
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case DIGITS_INTEGER:
+            integerValue = getIntegerValue();
                                  intervalInteger.setUpper_limit(integerValue);
+            break;
+          case VARIABLE_NAME:
+          case NEGATIVE_INFINITY:
+          case POSITIVE_INFINITY:
+            handleEndpointsAndVariablesForInteger(intervalInteger, false);
+            break;
+          default:
+            jj_la1[51] = jj_gen;
+            jj_consume_token(-1);
+            throw new ParseException();
+          }
           break;
-        case VARIABLE_NAME:
-        case NEGATIVE_INFINITY:
-        case POSITIVE_INFINITY:
-          handleEndpointsAndVariablesForInteger(intervalInteger, false);
+        case EMPTY_SET:
+          jj_consume_token(EMPTY_SET);
+                          intervalFloat.emptyInterval();
           break;
         default:
-          jj_la1[35] = jj_gen;
+          jj_la1[52] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
         break;
-      case EMPTY_SET:
-        jj_consume_token(EMPTY_SET);
-                          intervalFloat.emptyInterval();
+      case ENTIRE_SET:
+        jj_consume_token(ENTIRE_SET);
+                          intervalFloat.setEntireInterval();
+        jj_consume_token(CLOSE_INTERVAL_VARS);
+                  {if (true) return intervalInteger;}
         break;
       default:
-        jj_la1[36] = jj_gen;
+        jj_la1[53] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
-      jj_consume_token(CLOSE_INTERVAL_VARS);
-                  {if (true) return intervalInteger;}
       break;
     case LONG:
       jj_consume_token(LONG);
@@ -1473,7 +2272,7 @@ public class DSLParser implements DSLParserConstants {
           handleEndpointsAndVariablesForInteger(intervalInteger, true);
           break;
         default:
-          jj_la1[37] = jj_gen;
+          jj_la1[54] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1489,7 +2288,7 @@ public class DSLParser implements DSLParserConstants {
           handleEndpointsAndVariablesForInteger(intervalInteger, false);
           break;
         default:
-          jj_la1[38] = jj_gen;
+          jj_la1[55] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -1498,8 +2297,12 @@ public class DSLParser implements DSLParserConstants {
         jj_consume_token(EMPTY_SET);
                           intervalFloat.emptyInterval();
         break;
+      case ENTIRE_SET:
+        jj_consume_token(ENTIRE_SET);
+                          intervalFloat.setEntireInterval();
+        break;
       default:
-        jj_la1[39] = jj_gen;
+        jj_la1[56] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1507,7 +2310,7 @@ public class DSLParser implements DSLParserConstants {
                   {if (true) return intervalInteger;}
       break;
     default:
-      jj_la1[40] = jj_gen;
+      jj_la1[57] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1542,7 +2345,7 @@ public class DSLParser implements DSLParserConstants {
       EndpointsValue = getInfinityValue();
       break;
     default:
-      jj_la1[41] = jj_gen;
+      jj_la1[58] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1583,7 +2386,7 @@ public class DSLParser implements DSLParserConstants {
       EndpointsValue = getInfinityValue();
       break;
     default:
-      jj_la1[42] = jj_gen;
+      jj_la1[59] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1605,23 +2408,33 @@ public class DSLParser implements DSLParserConstants {
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[43];
+  final private int[] jj_la1 = new int[60];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
+  static private int[] jj_la1_3;
+  static private int[] jj_la1_4;
   static {
       jj_la1_init_0();
       jj_la1_init_1();
       jj_la1_init_2();
+      jj_la1_init_3();
+      jj_la1_init_4();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x40040,0x40040,0x0,0x0,0x0,0x0,0x0,0x1e00,0x1e00,0x1e00,0x0,0x1b80000,0x1b80000,0x1b80000,0x40000000,0xc1b80000,0x0,0x80000000,0x2a400000,0x16400000,0x80040000,0x1bc0000,0x1800000,0x380000,0x40000,0x16440000,0x16440000,0x16440000,0x2a440000,0x2a440000,0x2a440000,0x440000,0x440000,0x440000,0x440000,0x440000,0x440000,0x440000,0x440000,0x440000,0x1b80000,0x40000,0x40000,};
+      jj_la1_0 = new int[] {0x40040,0x40040,0x0,0x0,0x0,0x0,0x0,0x40000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1e00,0x1e00,0x1e00,0x0,0x1b80000,0x1b80000,0x1b80000,0x40000000,0xc1b80000,0x0,0x80000000,0x2a400000,0x16400000,0x80040000,0x1bc0000,0x1b80000,0x1800000,0x380000,0x40000,0x16440000,0x16440000,0x16440000,0x2a440000,0x2a440000,0x2a440000,0x440000,0x440000,0x440000,0x440000,0x440000,0x440000,0x100000,0x440000,0x440000,0x440000,0x1b80000,0x40000,0x40000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0xfff00000,0xfff00000,0x200,0x200,0xfff00000,0x7d00,0x7900,0x0,0x0,0x0,0x8080,0x0,0x0,0x2,0x0,0xf,0xc,0x1,0x0,0x0,0x1,0x0,0x0,0x0,0x2,0xc,0xc,0x1c,0xc,0xc,0x1c,0xc,0xc,0x1c,0xc,0xc,0x1c,0xc,0xc,0x1c,0x0,0xc,0xc,};
+      jj_la1_1 = new int[] {0xffe00000,0xffe00000,0x400,0x400,0x400,0x400,0x400,0x2,0x400,0x400,0x400,0x400,0x400,0x400,0x400,0x400,0x400,0x400,0x400,0xffe00000,0xfa00,0xf200,0x0,0x0,0x0,0x10100,0x0,0x0,0x2,0x0,0xf,0xc,0x1,0x0,0x0,0x1,0x0,0x0,0x0,0x0,0x2,0xc,0xc,0x3c,0xc,0xc,0x3c,0xc,0xc,0x3c,0xc,0xc,0x1c,0x20,0xc,0xc,0x3c,0x20,0xc,0xc,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x1fffffff,0x1fffffff,0x0,0x0,0x1fffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_2 = new int[] {0xffffffff,0xffffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xffffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+   }
+   private static void jj_la1_init_3() {
+      jj_la1_3 = new int[] {0xffffffff,0xffffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xffffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+   }
+   private static void jj_la1_init_4() {
+      jj_la1_4 = new int[] {0x3ffffff,0x3ffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x3ffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
 
   /** Constructor with InputStream. */
@@ -1635,7 +2448,7 @@ public class DSLParser implements DSLParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 43; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 60; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1649,7 +2462,7 @@ public class DSLParser implements DSLParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 43; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 60; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -1659,7 +2472,7 @@ public class DSLParser implements DSLParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 43; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 60; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1669,7 +2482,7 @@ public class DSLParser implements DSLParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 43; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 60; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -1678,7 +2491,7 @@ public class DSLParser implements DSLParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 43; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 60; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1687,7 +2500,7 @@ public class DSLParser implements DSLParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 43; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 60; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -1738,12 +2551,12 @@ public class DSLParser implements DSLParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[93];
+    boolean[] la1tokens = new boolean[154];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 43; i++) {
+    for (int i = 0; i < 60; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -1755,10 +2568,16 @@ public class DSLParser implements DSLParserConstants {
           if ((jj_la1_2[i] & (1<<j)) != 0) {
             la1tokens[64+j] = true;
           }
+          if ((jj_la1_3[i] & (1<<j)) != 0) {
+            la1tokens[96+j] = true;
+          }
+          if ((jj_la1_4[i] & (1<<j)) != 0) {
+            la1tokens[128+j] = true;
+          }
         }
       }
     }
-    for (int i = 0; i < 93; i++) {
+    for (int i = 0; i < 154; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

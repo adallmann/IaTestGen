@@ -166,27 +166,6 @@ public abstract class ArithmeticLibrarySpecification {
 	public abstract String getIntervalLowerLimit();
 
 	/**
-	 * Returns the translation of a method to check, if a given interval is empty.
-	 * 
-	 * Subclasses have to use PlaceHolders represented by following methods: <br>
-	 * <br>
-	 * 
-	 * outputType(1) --> type of output-parameter by sequence number <br>
-	 * outputName(1) --> name of output-parameter by sequence number <br>
-	 * inputName(1) --> name of input-parameter by sequence number <br>
-	 * <br>
-	 * 
-	 * Just use the same procedure as in getOperationsTranslation(), but there is just one
-	 * input (the interval) and one output (boolean). <br>
-	 * 
-	 * e.g.: String lowerLimit = outputType(1) + " " + outputName(1) + " = empty(" +
-	 * inputName(1) + ");";
-	 * 
-	 * @return translation of method to check if given interval is empty
-	 */
-	public abstract String checkIfIntervalEmptyTranslation();
-
-	/**
 	 * Return the translation for an empty interval in a string-array with length 2. <br>
 	 * The first position is the interval-datatype <br>
 	 * The second postition is the rule to declarate this datatype<br>
@@ -208,6 +187,11 @@ public abstract class ArithmeticLibrarySpecification {
 	 * @return translation string of interval
 	 */
 	public abstract String[] getEmptyIntervalTranslation();
+
+	/**
+ 	 *
+ 	 */
+	public abstract String[] getEntireIntervalTranslation();
 
 	/**
 	 * Translation of a negative interval-limit.

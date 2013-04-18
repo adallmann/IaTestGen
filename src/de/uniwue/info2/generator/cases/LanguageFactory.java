@@ -31,7 +31,8 @@ import java.util.List;
 
 import de.uniwue.info2.generator.cases.cpp.CppBoostUnitTestLibrary;
 import de.uniwue.info2.generator.cases.cpp.CppSpecification;
-import de.uniwue.info2.generator.cases.cpp.CppUniWueP1788ArithmeticLibrary;
+import de.uniwue.info2.generator.cases.cpp.CppUniWueP1788IEEE754ArithmeticLibrary;
+import de.uniwue.info2.generator.cases.cpp.CppUniWueP1788MPFLArithmeticLibrary;
 
 /**
  * This class is used to instantiate LanguageSpecification, ArithmeticLibrarySpecification and UnitTestLibrarySpecification.
@@ -89,7 +90,8 @@ public class LanguageFactory {
 	// TODO:
 	private List<Class<? extends ArithmeticLibrarySpecification>> listArithmeticLibrarySpecificationPlugins(File language_folder) {
 		List<Class<? extends ArithmeticLibrarySpecification>> specs = new ArrayList<Class<? extends ArithmeticLibrarySpecification>>();
-		specs.add(CppUniWueP1788ArithmeticLibrary.class);
+		specs.add(CppUniWueP1788IEEE754ArithmeticLibrary.class);
+		specs.add(CppUniWueP1788MPFLArithmeticLibrary.class);
 		return specs;
 	}
 
@@ -110,6 +112,10 @@ public class LanguageFactory {
 				LanguageSpecification lSpec = lClass.newInstance();
 
 				String lKey = lSpec.getOptionName();
+				if (lKey.contains("_")) {
+					throw new IllegalAccessException("option-name of your language specification contains \"_\"-character");
+				}
+
 				languageMap_.put(lKey, lSpec);
 				availableLanguageSpecifications_.add(lSpec);
 
@@ -118,6 +124,10 @@ public class LanguageFactory {
 
 				for (Class<? extends UnitTestLibrarySpecification> uClass : uClasses) {
 					UnitTestLibrarySpecification uSpec = uClass.newInstance();
+					if (uSpec.getOptionName().contains("_")) {
+						throw new IllegalAccessException("option-name of your unit-test specification contains \"_\"-character");
+					}
+
 					unitTestLibrariesMap_.put(uSpec.getOptionName(), uSpec);
 					if (availableUnitTestLibraries_.containsKey(lKey)) {
 						List<UnitTestLibrarySpecification> uList = availableUnitTestLibraries_.get(lKey);
@@ -134,6 +144,9 @@ public class LanguageFactory {
 
 				for (Class<? extends ArithmeticLibrarySpecification> aClass : aClasses) {
 					ArithmeticLibrarySpecification aSpec = aClass.newInstance();
+					if (aSpec.getOptionName().contains("_")) {
+						throw new IllegalAccessException("option-name of your ia specification contains \"_\"-character");
+					}
 					arithmeticLibrariesMap_.put(aSpec.getOptionName(), aSpec);
 					if (availableArithmeticLibraries_.containsKey(lKey)) {
 						List<ArithmeticLibrarySpecification> aList = availableArithmeticLibraries_.get(lKey);
