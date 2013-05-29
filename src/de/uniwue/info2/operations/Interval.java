@@ -5,17 +5,17 @@
  *    Marco Nehmeier (nehmeier@informatik.uni-wuerzburg.de)
  *    Institute of Computer Science,
  *    University of Wuerzburg, Germany
- *    
+ *
  *    Michael Jedich (m.jedich@gmail.com)
  *    University of Wuerzburg, Germany
- *    
- *    
+ *
+ *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
- *    
+ *
  *    http://www.apache.org/licenses/LICENSE-2.0
- *    
+ *
  *    Unless required by applicable law or agreed to in writing, software
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,9 +33,9 @@ import de.uniwue.info2.numerics.prec.SinglePrecisionFloat;
 
 /**
  * This class implements the interval-datatype.
- * 
+ *
  * @author Michael Jedich
- * 
+ *
  */
 public class Interval<T> {
 	private T upperLimit_ = null;
@@ -43,6 +43,7 @@ public class Interval<T> {
 	private Endpoints upperEndpoint_ = null;
 	private Endpoints lowerEndpoint_ = null;
 	private Class<?> type_;
+	private boolean entire_ = false;
 	private static final Class<?>[] basic_types = new Class<?>[] { Short.class, Integer.class, Long.class };
 
 	public Interval(Class<T> type) {
@@ -117,6 +118,14 @@ public class Interval<T> {
 		this.lowerEndpoint_ = null;
 	}
 
+	public void setEntireInterval() {
+		this.upperLimit_ = null;
+		this.lowerLimit_ = null;
+		this.upperEndpoint_ = null;
+		this.lowerEndpoint_ = null;
+		this.entire_ = true;
+	}
+
 	public void setLimits(T lower_limit, T upper_limit) {
 		setUpper_limit(upper_limit);
 		setLower_limit(lower_limit);
@@ -165,7 +174,14 @@ public class Interval<T> {
 		if (this.lowerEndpoint_ != null && this.upperLimit_ != null) {
 			return false;
 		}
+		if (this.entire_) {
+			return false;
+		}
 		return true;
+	}
+
+	public boolean isEntire() {
+		return this.entire_; 
 	}
 
 	private void setType(Class<?> cl) {
@@ -190,7 +206,6 @@ public class Interval<T> {
 		for (Class<?> cl : basic_types) {
 			accepted_types.add(cl);
 		}
-
 
 		// TODO:
 		// add float types

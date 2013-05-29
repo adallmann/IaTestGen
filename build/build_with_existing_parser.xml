@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project unit_test_generator with libraries in sub-folder">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required -->
+
+  <property name="lib.dir" value="lib"/>
+  <path id="classpath">
+    <fileset dir="../lib" includes="**/*.jar"/>
+  </path>
+
+    <target name="create_run_jar">
+      <delete dir="../bin"/>
+      <mkdir dir="../bin"/>
+				<javac srcdir="../src" debug="on" destdir="../bin" classpathref="classpath" includeantruntime="false"/>
+        <jar destfile="current/ia_gen.jar">
+            <manifest>
+                <attribute name="Main-Class" value="de.uniwue.info2.main.CommandLineInterpreter"/>
+                <attribute name="Class-Path" value=". lib/JInterval_all_include.jar lib/reflections-0.9.9-RC1-uberjar.jar lib/javassist.jar lib/guava-14.0.1.jar lib/commons-cli-1.2.jar lib/commons-lang-2.5.jar"/>
+            </manifest>
+            <fileset dir="../bin"/>
+        </jar>
+        <delete dir="current/lib"/>
+        <mkdir dir="current/lib"/>
+        <copy file="../lib/commons-cli-1.2.jar" todir="current/lib"/>
+        <copy file="../lib/commons-lang-2.5.jar" todir="current/lib"/>
+        <copy file="../lib/guava-14.0.1.jar" todir="current/lib"/>
+        <copy file="../lib/javassist.jar" todir="current/lib"/>
+        <copy file="../lib/reflections-0.9.9-RC1-uberjar.jar" todir="current/lib"/>
+				<copy file="../lib/JInterval_all_include.jar" todir="current/lib"/>
+
+    </target>
+</project>

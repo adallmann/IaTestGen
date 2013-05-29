@@ -42,6 +42,7 @@ import de.uniwue.info2.numerics.FloatingPoint;
 import de.uniwue.info2.numerics.prec.DoublePrecisionFloat;
 import de.uniwue.info2.numerics.prec.SinglePrecisionFloat;
 import de.uniwue.info2.operations.GenericParameter;
+import de.uniwue.info2.operations.Set;
 import de.uniwue.info2.operations.Interval;
 import de.uniwue.info2.operations.Operation;
 import de.uniwue.info2.generator.OperationsPool;
@@ -63,15 +64,17 @@ public class DSLParser
 {
   // dsl information, updated by the dsl
   private static String dslAuthors, dslVersion, dslDescription;
-  
 
   // information for generated parser
   // if parser has been modified, update this information:
   private final static String parserDescription = 
   		"Early Version of Parser Generator";
   private final static String parserVersion = "0.8";
-  private final static String parserAuthors = "Michael Jedich";
-  
+  private final static String parserAuthors = "Copyright 2013\nMarco Nehmeier"
+			+ " (nehmeier@informatik.uni-wuerzburg.de)\n"
+			+ "Institute of Computer Science,\nUniversity of Wuerzburg, Germany"
+			+ "\n\nMichael Jedich (m.jedich@gmail.com)\n" 
+			+ "University of Wuerzburg, Germany";
   // variables specified in the dsl
   private HashMap<String, GenericParameter<?>> variables_;
   
@@ -83,7 +86,7 @@ public class DSLParser
   private String currentOperationDescription_ = null;
   private boolean currentOperationRequired_ = true;
   private boolean currentOperationInputMode_ = true;
-
+	private Class<?> currentMixedTypeOutput_ = null;
 
   // used for an exception message when handling variables
   private String lastUsedVariableName_;
@@ -287,9 +290,26 @@ TOKEN_MGR_DECLS :
 	| < POSITIVE_INFINITY : "+inf" >
 	
 	| < EMPTY_SET : "empty" >
+	| < ENTIRE_SET : "entire" >
 	
 	// end of line
 	| < EOL : ";" >
+
+	// 
+	| < CLOSE_PAR_LIST : ")" >
+	| < OPEN_PAR_LIST : "(" >
+	| < EQUAL : "=" >
+	| < SP : "," > 
+	| < NG : "!" > 
+	| < SUBSETEQ : "subseteq=" > 
+	| < SUBSETNEQ : "subsetneq=" > 
+	| < SUPERSETEQ : "superseteq=" > 
+	| < SUPERSETNEQ : "supersetneq=" > 
+	| < OPEN_TYPE : "<" >
+	| < CLOSE_TYPE : ">" >
+	| < OPEN_INTERVAL_VARS : "[" >
+	| < CLOSE_INTERVAL_VARS : "]" >
+	| < PRIMITIVE_PAR_SEP : ":" >
 }
 
 
@@ -339,45 +359,456 @@ void operation() :
 }
 {
   (
-  	operation = "pos" 						"(" interval() ")" 
-		switchToOutput() 							"="	interval()
+// posibile parameters
+// interval(),  bool(), number()
+
+// -----------------------------------------------------------------------------
+/// Non-arithmetic set operations, see P1788/D7.1 Sect. 9.6.7
+// -----------------------------------------------------------------------------
+  	operation = "intersect" 						 
+		input() interval() <SP> interval()
+		output() interval()
   |
-  	operation = "neg" 						"(" interval() ")" 
-		switchToOutput() 							"="	interval()
+  	operation = "hull" 						 
+		input() interval() <SP> interval()
+		output() interval()
   |
-  	operation = "add"							"(" interval() "," interval() ")" 	
-		switchToOutput() 							"=" interval()
+// -----------------------------------------------------------------------------
+// Numeric functions on intervals, see P1788/D7.1 Sect. 9.6.9
+// -----------------------------------------------------------------------------
+  	operation = "inf" 						 
+		input() interval()
+		output() number()
   |
-  	operation = "sub" 						"(" interval() "," interval() ")" 	
-		switchToOutput() 							"=" interval()
+  	operation = "sup" 						 
+		input() interval()
+		output() number()
   |
-  	operation = "mul" 						"(" interval() "," interval() ")" 	
-		switchToOutput() 							"=" interval()
+  	operation = "mid" 						 
+		input() interval()
+		output() number()
   |
-  	operation = "div" 						"(" interval() "," interval() ")" 	
-		switchToOutput() 							"=" interval()
+  	operation = "rad" 						 
+		input() interval()
+		output() number()
   |
-  	operation = "inv" 						"(" interval() ")" 	
-		switchToOutput() 							"=" interval()
+  	operation = "mid_rad" 						 
+		input() interval()
+		output() number() <SP> number()
   |
-  	operation = "sqrt"		 				"(" interval() ")" 	
-		switchToOutput() 							"=" interval()
+  	operation = "wid" 						 
+		input() interval()
+		output() number()
   |
-  	operation = "fma"							"(" interval() "," interval() "," interval()")" 	
-		switchToOutput() 							"=" interval()
+  	operation = "mag" 						 
+		input() interval()
+		output() number()
   |
-  	operation = "interval_case" 	"(" interval() "," interval() "," interval()")" 	
-		switchToOutput() 							"=" interval()
+  	operation = "mig" 						 
+		input() interval()
+		output() number()
   |
 
+// -----------------------------------------------------------------------------
+// Boolean functions on intervals, see P1788/D7.0 Sect. 9.6.10
+// -----------------------------------------------------------------------------
+  	operation = "is_empty" 						 
+		input() interval()
+		output() bool()
+  |
+  	operation = "is_entire" 						 
+		input() interval()
+		output() bool()
+  |
+  	operation = "is_equal" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "contained_in" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "contains" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "less" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "greater" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "precedes" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "succeeds" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "is_interior" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "contains_interior" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "strictly_less" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "strictly_greater" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "strictly_precedes" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "strictly_succeeds" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+  	operation = "are_disjoint" 						 
+		input() interval() <SP> interval()
+		output() bool()
+  |
+
+// -----------------------------------------------------------------------------
+// Forward elementary functions
+// -----------------------------------------------------------------------------
+  	operation = "pos" 						
+		input() interval()  
+		output() interval()
+  |
+  	operation = "neg" 						 
+		input() interval()  
+		output() interval()
+  |
+  	operation = "add" 
+ 		input()	interval() <SP> interval() 	
+		output() interval()
+  |
+  	operation = "sub" 
+ 		input()	interval() <SP> interval() 	
+		output() interval()
+  |
+  	operation = "mul"
+ 		input()	interval() <SP> interval() 	
+		output() interval()
+  |
+  	operation = "div"
+ 		input()	interval() <SP> interval() 	
+		output() interval()
+  |
+  	operation = "inv"
+		input() interval()  
+		output() interval()
+  |
+  	operation = "sqrt"
+		input() interval()  
+		output() interval()
+  |
+  	operation = "fma"						  	
+		input() interval() <SP> interval() <SP> interval()  
+		output() interval()
+  |
+  	operation = "interval_case"
+		input() interval() <SP> interval() <SP> interval()  
+		output() interval()
+	|
+		operation = "sqr"
+		input() interval()  
+		output() interval()
+	|
+		operation = "pown"
+		input() interval() <SP> number()
+		output() interval()
+  |
+  	operation = "pow"
+ 		input()	interval() <SP> interval() 	
+		output() interval()
+	|
+		operation = "exp"
+		input() interval()  
+		output() interval()
+	|
+		operation = "exp2"
+		input() interval()  
+		output() interval()
+	|
+		operation = "exp10"
+		input() interval()  
+		output() interval()
+	|
+		operation = "log"
+		input() interval()  
+		output() interval()
+	|
+		operation = "log2"
+		input() interval()  
+		output() interval()
+	|
+		operation = "log10"
+		input() interval()  
+		output() interval()
+	|
+		operation = "sin"
+		input() interval()  
+		output() interval()
+	|
+		operation = "cos"
+		input() interval()  
+		output() interval()
+	|
+		operation = "tan"
+		input() interval()  
+		output() interval()
+	|
+		operation = "asin"
+		input() interval()  
+		output() interval()
+	|
+		operation = "acos"
+		input() interval()  
+		output() interval()
+	|
+		operation = "atan"
+		input() interval()  
+		output() interval()
+  |
+  	operation = "atan2"
+ 		input()	interval() <SP> interval() 	
+		output() interval()
+	|
+		operation = "sinh"
+		input() interval()  
+		output() interval()
+	|
+		operation = "cosh"
+		input() interval()  
+		output() interval()
+	|
+		operation = "tanh"
+		input() interval()  
+		output() interval()
+	|
+		operation = "asinh"
+		input() interval()  
+		output() interval()
+	|
+		operation = "acosh"
+		input() interval()  
+		output() interval()
+	|
+		operation = "atanh"
+		input() interval()  
+		output() interval()
+	|
+		operation = "sign"
+		input() interval()  
+		output() interval()
+	|
+		operation = "ceil"
+		input() interval()  
+		output() interval()
+	|
+		operation = "floor"
+		input() interval()  
+		output() interval()
+	|
+		operation = "trunc"
+		input() interval()  
+		output() interval()
+	|
+		operation = "round_ties_to_even"
+		input() interval()  
+		output() interval()
+	|
+		operation = "round_ties_to_away"
+		input() interval()  
+		output() interval()
+	|
+		operation = "abs"
+		input() interval()  
+		output() interval()
+	|
+		operation = "min"
+		input() interval() (<SP> interval())+
+		output() interval()
+	|
+		operation = "max"
+		input() interval() (<SP> interval())+
+		output() interval()
+	|
+
+// -----------------------------------------------------------------------------
+// Reverse elementary functions, see P1788/D7.0 Sect. 9.6.5 Table 2
+// -----------------------------------------------------------------------------
+
+		operation = "sqr_rev"
+		input() interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "inv_rev"
+		input() interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "abs_rev"
+		input() interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "pown_rev"
+		input() interval() <SP> (interval() <SP>)?  number2()
+		output() interval()
+	|
+		operation = "sin_rev"
+		input() interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "cos_rev"
+		input() interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "tan_rev"
+		input() interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "cosh_rev"
+		input() interval() (<SP> interval())?
+		output() interval()
+	|
+
+// reverse versions of binary point functions
+
+		operation = "mul_rev"
+		input() interval() <SP> interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "div_rev1"
+		input() interval() <SP> interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "div_rev2"
+		input() interval() <SP> interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "pow_rev1"
+		input() interval() <SP> interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "pow_rev2"
+		input() interval() <SP> interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "atan2_rev1"
+		input() interval() <SP> interval() (<SP> interval())?
+		output() interval()
+	|
+		operation = "atan2_rev2"
+		input() interval() <SP> interval() (<SP> interval())?
+		output() interval()
+
+// -----------------------------------------------------------------------------
+// Cancellative addition and subtraction, see P1788/D7.0 Sect. 9.6.6
+// -----------------------------------------------------------------------------
+	|
+		operation = "cancel_plus"
+		input() interval() <SP> interval()  
+		output() interval()
+	|
+		operation = "cancel_minus"
+		input() interval() <SP> interval()  
+		output() interval()
+
+// -----------------------------------------------------------------------------
+// Recommended forward elementary functions on intervals, 
+// see P1788/D7.0 Sect. 9.7.1 Table 5
+// -----------------------------------------------------------------------------
+	|
+		operation = "rootn"
+		input() interval() <SP> number()  
+		output() interval()
+	|
+		operation = "expm1"
+		input() interval()  
+		output() interval()
+	|
+		operation = "exp2m1"
+		input() interval()  
+		output() interval()
+	|
+		operation = "exp10m1"
+		input() interval()  
+		output() interval()
+	|
+		operation = "logp1"
+		input() interval()  
+		output() interval()
+	|
+		operation = "log2p1"
+		input() interval()  
+		output() interval()
+	|
+		operation = "log10p1"
+		input() interval()  
+		output() interval()
+	|
+		operation = "compoundm1"
+		input() interval() <SP> interval() 
+		output() interval()
+	|
+		operation = "hypot"
+		input() interval() <SP> interval() 
+		output() interval()
+	|
+		operation = "r_sqrt"
+		input() interval() 
+		output() interval()
+	|
+		operation = "sin_pi"
+		input() interval() 
+		output() interval()
+	|
+		operation = "cos_pi"
+		input() interval() 
+		output() interval()
+	|
+		operation = "tan_pi"
+		input() interval() 
+		output() interval()
+	|
+		operation = "asin_pi"
+		input() interval() 
+		output() interval()
+	|
+		operation = "acos_pi"
+		input() interval() 
+		output() interval()
+	|
+		operation = "atan_pi"
+		input() interval() 
+		output() interval()
+	|
+		operation = "atan2_pi"
+		input() interval() <SP> interval()
+		output() interval()
+
+// -----------------------------------------------------------------------------
+// Recommended interval overlapping, see P1788/D7.0 Sect. 9.7.2
+// -----------------------------------------------------------------------------
 
 
-  	operation = "median"  			"(" interval() ")" 					switchToOutput() "=" 	number()
-  |
-  	operation = "is_in"	  			"(" number() "," interval() ")" 	switchToOutput() "=" 	bool()
-  |
-  	operation = "bisect"  			"(" interval() ")"					switchToOutput() "=" 	interval() "," interval()
-  )
+// -----------------------------------------------------------------------------
+// Recommended slope functions, see P1788/D7.0 Sect. 9.7.3 Table 7
+// -----------------------------------------------------------------------------
+
+)
+
+
   
   < EOL >
   {
@@ -388,10 +819,50 @@ void operation() :
 }
 
 
-void switchToOutput() :
-{}
+void output() :
+{ }
 {
- { this.currentOperationInputMode_ = false; }
+	< CLOSE_PAR_LIST > 
+	{ this.currentOperationInputMode_ = false; }
+  (
+		relationOperator()
+		|
+		(
+			// if result was negated
+	  	< NG >
+			{ this.currentOperation_.negateResult(); }
+ 	 		relationOperator()
+		)
+	)
+}
+
+
+void relationOperator() :
+{ }
+{
+ 	 (
+ 		< EQUAL > 
+ 	 )
+ 	 |
+ 	 (
+  	< SUBSETEQ > 	
+		{ this.currentOperation_.setSetRelation(Set.SUBSET); }
+ 	 )
+ 	 |
+ 	 (
+  	< SUBSETNEQ > 	
+		{ this.currentOperation_.setSetRelation(Set.PROPER_SUBSET); }
+ 	 )
+ 	 |
+ 	 (
+  	< SUPERSETEQ > 	
+		{ this.currentOperation_.setSetRelation(Set.SUPERSET); }
+ 	 )
+ 	 |
+ 	 (
+  	< SUPERSETNEQ > 	
+		{ this.currentOperation_.setSetRelation(Set.PROPER_SUPERSET); }
+ 	 )
 }
 
 
@@ -464,6 +935,72 @@ void commentTag(boolean operation) :
   )
 }
 
+/* ---------------------Handle Mix Types-------------------- */
+void input() :
+{ }
+{
+	(
+		( getReturnType() < OPEN_PAR_LIST > ) | < OPEN_PAR_LIST > 
+ 	)
+}
+
+// look for mixed type declaration
+void getReturnType() :
+{ }
+{
+	< OPEN_TYPE >
+	(
+		(
+			( < INTERVAL > )
+			< OPEN_TYPE >
+				(
+					(
+						< FLOAT > 
+						{ this.currentOperation_.setMixedTypeOutput(SinglePrecisionFloat.class); }
+					)
+					| 
+					(
+						< DOUBLE > 
+						{ this.currentOperation_.setMixedTypeOutput(DoublePrecisionFloat.class); }
+					)
+					|
+					(
+						< SHORT > 
+						{ this.currentOperation_.setMixedTypeOutput(Short.class); }
+					)
+					|
+					(
+						< INTEGER >
+						{ this.currentOperation_.setMixedTypeOutput(Integer.class); }
+					)
+					|
+					(
+						< LONG > 
+						{ this.currentOperation_.setMixedTypeOutput(Long.class); }
+					)
+				)
+			< CLOSE_TYPE >
+		)
+		| 
+		(
+			(< DOUBLE >)
+			{ this.currentOperation_.setMixedTypeOutput(DoublePrecisionFloat.class); }
+			|
+			(< FLOAT >)
+			{ this.currentOperation_.setMixedTypeOutput(SinglePrecisionFloat.class); }
+			|
+			(< INTEGER >)
+			{ this.currentOperation_.setMixedTypeOutput(Integer.class); }
+			|
+			(< SHORT> )
+			{ this.currentOperation_.setMixedTypeOutput(Short.class); }
+			|
+			(< LONG > )
+			{ this.currentOperation_.setMixedTypeOutput(Long.class); }
+		)
+	)
+	< CLOSE_TYPE >
+}
 
 /* ---------------------Handle variables-------------------- */
 
@@ -474,7 +1011,7 @@ void variable() :
 	GenericParameter <?> par;
 }
 {
-	name = <VARIABLE_NAME> "=" par = getParameter() < EOL >
+	name = <VARIABLE_NAME> < EQUAL > par = getParameter() < EOL >
 	{
 		variables_.put(name.image, par);
 	}
@@ -539,22 +1076,22 @@ GenericParameter <?> getParameter() :
 	Endpoints emptySetParam = null;
 }
 {
-	< SHORT > ":" shortParam = getShortValue()
+	< SHORT > < PRIMITIVE_PAR_SEP > shortParam = getShortValue()
 	{ return new GenericParameter<Short>(shortParam); }
 	
-	|< INTEGER > ":" integerParam = getIntegerValue()
+	|< INTEGER > < PRIMITIVE_PAR_SEP > integerParam = getIntegerValue()
 	{ return new GenericParameter<Integer>(integerParam); }
 	
-	|< LONG > ":" longParam = getLongValue()
+	|< LONG > < PRIMITIVE_PAR_SEP > longParam = getLongValue()
 	{ return new GenericParameter<Long>(longParam); }
 	
-	|< FLOAT > ":" floatParam = getSinglePrecisionFloatValue()
+	|< FLOAT > < PRIMITIVE_PAR_SEP > floatParam = getSinglePrecisionFloatValue()
 	{ return new GenericParameter<SinglePrecisionFloat>(floatParam); }
 	
-	|< DOUBLE > ":" doubleParam = getDoublePrecisionFloatValue()
+	|< DOUBLE > < PRIMITIVE_PAR_SEP > doubleParam = getDoublePrecisionFloatValue()
 	{ return new GenericParameter<DoublePrecisionFloat>(doubleParam); }
 	
-	|(< BOOL > ":")? boolParam = getBoolValue()
+	|(< BOOL > < PRIMITIVE_PAR_SEP >)? boolParam = getBoolValue()
 	{ return new GenericParameter<Boolean>(boolParam); }
 	
 	| intervalParam = getIntervalParameter()
@@ -656,9 +1193,11 @@ void bool() :
 	)
 }
 
+
 void number() :
 {
 	GenericParameter <?> variable = null;
+
 }
 {
 	floatingPoint()
@@ -681,15 +1220,26 @@ void number() :
 	)
 }
 
+void number2() :
+{
+	GenericParameter <?> variable = null;
+}
+{
+	floatingPoint()
+	|
+	integer()
+}
+
 
 void floatingPoint() :
 {
 	FloatingPoint fp;
 }
 {
-	(< FLOAT > ":") fp = getSinglePrecisionFloatValue() 
+	(< FLOAT > < PRIMITIVE_PAR_SEP >) fp = getSinglePrecisionFloatValue() 
+	addParameterToFunction(new GenericParameter<FloatingPoint> (fp))
 	| 
-	(< DOUBLE > ":") fp = getDoublePrecisionFloatValue() 
+	(< DOUBLE > < PRIMITIVE_PAR_SEP >) fp = getDoublePrecisionFloatValue() 
 	addParameterToFunction(new GenericParameter<FloatingPoint> (fp))
 }
 
@@ -699,9 +1249,9 @@ void integer() :
 }
 {
 		(
-		(< SHORT > ":") num = getShortValue()
-		| (< INTEGER > ":") num = getIntegerValue()
-		| (< LONG > ":") num = getLongValue()
+		(< SHORT > < PRIMITIVE_PAR_SEP >) num = getShortValue()
+		| (< INTEGER > < PRIMITIVE_PAR_SEP >) num = getIntegerValue()
+		| (< LONG > < PRIMITIVE_PAR_SEP >) num = getLongValue()
 		)
 	 	addParameterToFunction(new GenericParameter<Number> (num))
 }
@@ -758,11 +1308,11 @@ Interval<?> getIntervalParameter() :
 
 {
 
-	(< INTERVAL > "<")
+	(< INTERVAL > < OPEN_TYPE >)
 	(
 	(
-		< FLOAT > ">" 
-		"["
+		< FLOAT > < CLOSE_TYPE > 
+		< OPEN_INTERVAL_VARS >
 		{ intervalFloat.specifySubclass(SinglePrecisionFloat.class); }
 		(
 			(  
@@ -771,7 +1321,7 @@ Interval<?> getIntervalParameter() :
 				{ intervalFloat.setLower_limit(floatValue); }
 				| handleEndpointsAndVariablesForFloat(intervalFloat, true)
 			)
-			"," 
+			< SP > 
 			(
 				floatValue = getSinglePrecisionFloatValue() 
 				{intervalFloat.setUpper_limit(floatValue);}
@@ -781,14 +1331,17 @@ Interval<?> getIntervalParameter() :
 			|
 			< EMPTY_SET >
 			{ intervalFloat.emptyInterval(); }
+			|
+			< ENTIRE_SET >
+			{ intervalFloat.setEntireInterval(); }
 		)
-		"]"
+		< CLOSE_INTERVAL_VARS >
 		{ return intervalFloat; }
 	)
 	| 
 	(
-		< DOUBLE > ">" 
-		"["
+		< DOUBLE > < CLOSE_TYPE > 
+		< OPEN_INTERVAL_VARS >
 		{ intervalFloat.specifySubclass(DoublePrecisionFloat.class); }
 		(
 			(  
@@ -797,7 +1350,7 @@ Interval<?> getIntervalParameter() :
 				{ intervalFloat.setLower_limit(floatValue); }
 				| handleEndpointsAndVariablesForFloat(intervalFloat, true)
 			)
-			"," 
+			< SP > 
 			(
 				floatValue = getDoublePrecisionFloatValue() 
 				{intervalFloat.setUpper_limit(floatValue);}
@@ -807,14 +1360,17 @@ Interval<?> getIntervalParameter() :
 			|
 			< EMPTY_SET >
 			{ intervalFloat.emptyInterval(); }
+			|
+			< ENTIRE_SET >
+			{ intervalFloat.setEntireInterval(); }
 		)
-		"]"
+		< CLOSE_INTERVAL_VARS >
 		{ return intervalFloat; }
 	)
 	|
 	(
-		< SHORT > ">" 
-		"["
+		< SHORT > < CLOSE_TYPE > 
+		< OPEN_INTERVAL_VARS >
 		{ intervalInteger.specifySubclass(Short.class); }
 		(
 			(  
@@ -823,7 +1379,7 @@ Interval<?> getIntervalParameter() :
 				{ intervalInteger.setLower_limit(integerValue); }
 				| handleEndpointsAndVariablesForInteger(intervalInteger, true)
 			)
-			"," 
+			< SP > 
 			(
 				integerValue = getShortValue() 
 				{intervalInteger.setUpper_limit(integerValue);}
@@ -833,14 +1389,17 @@ Interval<?> getIntervalParameter() :
 			|
 			< EMPTY_SET >
 			{ intervalFloat.emptyInterval(); }
+			|
+			< ENTIRE_SET >
+			{ intervalFloat.setEntireInterval(); }
 		)
-		"]"
+		< CLOSE_INTERVAL_VARS >
 		{ return intervalInteger; }
 	)
 	|
 	(
-		< INTEGER > ">" 
-		"["
+		< INTEGER > < CLOSE_TYPE > 
+		< OPEN_INTERVAL_VARS >
 		{ intervalInteger.specifySubclass(Integer.class); }
 		(
 			(  
@@ -849,7 +1408,7 @@ Interval<?> getIntervalParameter() :
 				{ intervalInteger.setLower_limit(integerValue); }
 				| handleEndpointsAndVariablesForInteger(intervalInteger, true)
 			)
-			"," 
+			< SP > 
 			(
 				integerValue = getIntegerValue() 
 				{intervalInteger.setUpper_limit(integerValue);}
@@ -858,14 +1417,18 @@ Interval<?> getIntervalParameter() :
 			)
 			|
 			< EMPTY_SET >
-			{ intervalFloat.emptyInterval(); }		)
-		"]"
+			{ intervalFloat.emptyInterval(); }		
+			|
+			< ENTIRE_SET >
+			{ intervalFloat.setEntireInterval(); }
+		)
+		< CLOSE_INTERVAL_VARS >
 		{ return intervalInteger; }
 	)
 	|
 	(
-		< LONG > ">" 
-		"["
+		< LONG > < CLOSE_TYPE > 
+		< OPEN_INTERVAL_VARS >
 		{ intervalInteger.specifySubclass(Long.class); }
 		(
 			(  
@@ -874,7 +1437,7 @@ Interval<?> getIntervalParameter() :
 				{ intervalInteger.setLower_limit(integerValue); }
 				| handleEndpointsAndVariablesForInteger(intervalInteger, true)
 			)
-			"," 
+			< SP > 
 			(
 				integerValue = getLongValue() 
 				{intervalInteger.setUpper_limit(integerValue);}
@@ -884,8 +1447,11 @@ Interval<?> getIntervalParameter() :
 			|
 			< EMPTY_SET >
 			{ intervalFloat.emptyInterval(); }
+			|
+			< ENTIRE_SET >
+			{ intervalFloat.setEntireInterval(); }
 		)
-		"]"
+		< CLOSE_INTERVAL_VARS >
 		{ return intervalInteger; }
 	)
 	)

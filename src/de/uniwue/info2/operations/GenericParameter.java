@@ -45,8 +45,13 @@ public class GenericParameter<T> {
 			Long.class, Boolean.class, Interval.class, Endpoints.class };
 
 	public GenericParameter(T initValue) {
-		this.setType(initValue.getClass());
-		this.setValue(initValue);
+		if (initValue != null) {
+			this.setType(initValue.getClass());
+			this.setValue(initValue);
+		}
+		else {
+			throw new NullPointerException("GenericParameter value is NULL!");
+		}
 	}
 
 	public boolean hasType(Class<?> type) {
