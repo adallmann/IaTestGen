@@ -22,7 +22,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package de.uniwue.info2.generator.cases;
+package de.uniwue.info2.generator;
 
 import de.uniwue.info2.operations.Set;
 

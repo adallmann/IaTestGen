@@ -22,7 +22,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package de.uniwue.info2.generator.cases;
+package de.uniwue.info2.generator;
 
 /**
  * This class is used to store Placeholders used in LanguageSpecification,
@@ -49,6 +49,7 @@ public final class PlaceHolder {
 
 	// place holder used in "getCodeSequence" by Subclasses of "UnitTestLibrarySpecification"
 	public static final String DYNAMIC_TEST_METHODS = ID + "DYNAMIC_TEST_METHODS" + ID;
+	public static final String ARITHMETIC_CUSTOM_METHODS = ID + "ARITHMETIC_CUSTOM_METHODS" + ID;
 
 	// place holder used in "getTestMethod()" by Subclasses of "UnitTestLibrarySpecification"
 	public static final String TEST_CASE_COMMENTS = ID + "TEST_CASE_COMMENTS" + ID;
@@ -81,6 +82,11 @@ public final class PlaceHolder {
 
 	// arbitrary number of values symbol
 	public static final String VAR_ARGS = ID + "__VAR_ARGS__" + ID;
+
+	// plugin-names
+	public static final String LANGUAGE_SPEC_NAME = ID + "LANGUAGE_SPEC_NAME" + ID;
+	public static final String UNITTEST_SPEC_NAME = ID + "UNITTEST_SPEC_NAME" + ID;
+	public static final String ARITHMETIC_SPEC_NAME = ID + "ARITHMETIC_SPEC_NAME" + ID;
 
 	/**
 	 * Adds spaces as intendentation.

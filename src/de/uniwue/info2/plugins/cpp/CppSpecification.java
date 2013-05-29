@@ -22,21 +22,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package de.uniwue.info2.generator.cases.cpp;
+package de.uniwue.info2.plugins.cpp;
 
-import static de.uniwue.info2.generator.cases.PlaceHolder.ARITHMETIC_LIB_IMPORTS;
-import static de.uniwue.info2.generator.cases.PlaceHolder.CUSTOM_METHODS;
-import static de.uniwue.info2.generator.cases.PlaceHolder.HEAD_COMMENT;
-import static de.uniwue.info2.generator.cases.PlaceHolder.LANGUAGE_IMPORTS;
-import static de.uniwue.info2.generator.cases.PlaceHolder.NAME;
-import static de.uniwue.info2.generator.cases.PlaceHolder.TEST_CASES;
-import static de.uniwue.info2.generator.cases.PlaceHolder.TEST_LIB_IMPORTS;
-import static de.uniwue.info2.generator.cases.PlaceHolder.TYPE;
-import static de.uniwue.info2.generator.cases.PlaceHolder.VALUE;
+import static de.uniwue.info2.generator.PlaceHolder.*;
 
 import java.util.HashMap;
 
-import de.uniwue.info2.generator.cases.LanguageSpecification;
+import de.uniwue.info2.generator.LanguageSpecification;
 import de.uniwue.info2.numerics.prec.DoublePrecisionFloat;
 import de.uniwue.info2.numerics.prec.SinglePrecisionFloat;
 
@@ -74,7 +66,7 @@ public class CppSpecification extends LanguageSpecification {
 	@Override
 	public String getImportsAndDefinitions() {
 		StringBuffer buffer = new StringBuffer();
-		buffer.append("#include <iostream>\n");
+		buffer.append("#include <iostream>");
 		return buffer.toString();
 	}
 	
@@ -83,19 +75,19 @@ public class CppSpecification extends LanguageSpecification {
 		StringBuffer buffer = new StringBuffer();
 		
 		// description from dsl
-		buffer.append(HEAD_COMMENT + "\n");
+		buffer.append(HEAD_COMMENT);
 		
 		// imports and definitions
-		buffer.append(LANGUAGE_IMPORTS + "\n\n");
-		buffer.append(ARITHMETIC_LIB_IMPORTS + "\n\n");
-		buffer.append(TEST_LIB_IMPORTS + "\n");
-		
+		buffer.append(LANGUAGE_IMPORTS);
+		buffer.append(ARITHMETIC_LIB_IMPORTS);
+		buffer.append(TEST_LIB_IMPORTS);
+
 		// section for custom methods
-		buffer.append(CUSTOM_METHODS + "\n");
+		buffer.append(CUSTOM_METHODS);
 		
 		// test functions
-		buffer.append(TEST_CASES + "\n");
-		
+		buffer.append(TEST_CASES);
+
 		return buffer.toString();
 	}
 	
@@ -136,8 +128,7 @@ public class CppSpecification extends LanguageSpecification {
 		StringBuffer buffer = new StringBuffer();
 
 
-
-		buffer.append("\n\n// Hex to Float Conversion\n");
+		buffer.append("// Hex to Float Conversion\n");
 		buffer.append("const unsigned float_length = sizeof(float);\n");
 		buffer.append("float hex_string_to_float(std::string hexStr) {\n");
 		buffer.append("\tunsigned char temp[float_length];\n");
@@ -173,8 +164,13 @@ public class CppSpecification extends LanguageSpecification {
 		buffer.append("\tdouble x;\n");
 		buffer.append("\tstd::copy(hex_array, hex_array + double_length,\n");
 		buffer.append("\treinterpret_cast<char*> (&x));\n");
-		buffer.append("\treturn x;\n}\n");
+		buffer.append("\treturn x;\n}");
 
 		return buffer.toString();
+	}
+
+	@Override
+	public String getOutputFileName() {
+		return null;
 	}
 }

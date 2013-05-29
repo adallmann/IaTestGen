@@ -22,7 +22,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package de.uniwue.info2.generator.cases;
+package de.uniwue.info2.generator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -126,6 +126,13 @@ public abstract class LanguageSpecification {
 	public List<ArithmeticLibrarySpecification> getArithmeticLibraryList() {
 		return arithmeticLibraryList;
 	}
+
+	/**
+	 * Returns name to use for file-naming.
+	 * 
+	 * @return
+	 */
+	public abstract String getOutputFileName();
 
 	/**
 	 * Return list of linked arithmetic libraries.

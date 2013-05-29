@@ -1197,6 +1197,7 @@ void bool() :
 void number() :
 {
 	GenericParameter <?> variable = null;
+
 }
 {
 	floatingPoint()
@@ -1236,6 +1237,7 @@ void floatingPoint() :
 }
 {
 	(< FLOAT > < PRIMITIVE_PAR_SEP >) fp = getSinglePrecisionFloatValue() 
+	addParameterToFunction(new GenericParameter<FloatingPoint> (fp))
 	| 
 	(< DOUBLE > < PRIMITIVE_PAR_SEP >) fp = getDoublePrecisionFloatValue() 
 	addParameterToFunction(new GenericParameter<FloatingPoint> (fp))
@@ -1415,10 +1417,11 @@ Interval<?> getIntervalParameter() :
 			)
 			|
 			< EMPTY_SET >
-			{ intervalFloat.emptyInterval(); }		)
+			{ intervalFloat.emptyInterval(); }		
 			|
 			< ENTIRE_SET >
 			{ intervalFloat.setEntireInterval(); }
+		)
 		< CLOSE_INTERVAL_VARS >
 		{ return intervalInteger; }
 	)

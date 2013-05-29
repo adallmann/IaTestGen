@@ -22,7 +22,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package de.uniwue.info2.generator.cases;
+package de.uniwue.info2.generator;
 
 import java.util.HashMap;
 
@@ -214,5 +214,7 @@ public abstract class ArithmeticLibrarySpecification {
 	 * @return translated string
 	 */
 	public abstract String getParameterSeparator();
+
+	public abstract String getCustomMethods();
 
 }

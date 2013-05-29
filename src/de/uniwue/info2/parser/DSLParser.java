@@ -1905,6 +1905,7 @@ public class DSLParser implements DSLParserConstants {
       jj_consume_token(FLOAT);
       jj_consume_token(PRIMITIVE_PAR_SEP);
       fp = getSinglePrecisionFloatValue();
+      addParameterToFunction(new GenericParameter<FloatingPoint> (fp));
       break;
     case DOUBLE:
       jj_consume_token(DOUBLE);
@@ -2185,71 +2186,62 @@ public class DSLParser implements DSLParserConstants {
                   {if (true) return intervalInteger;}
       break;
     case INTEGER:
-    case ENTIRE_SET:
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case INTEGER:
-        jj_consume_token(INTEGER);
-        jj_consume_token(CLOSE_TYPE);
-        jj_consume_token(OPEN_INTERVAL_VARS);
+      jj_consume_token(INTEGER);
+      jj_consume_token(CLOSE_TYPE);
+      jj_consume_token(OPEN_INTERVAL_VARS);
                   intervalInteger.specifySubclass(Integer.class);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case VARIABLE_NAME:
+      case DIGITS_INTEGER:
+      case NEGATIVE_INFINITY:
+      case POSITIVE_INFINITY:
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case VARIABLE_NAME:
         case DIGITS_INTEGER:
+          integerValue = getIntegerValue();
+                                  intervalInteger.setLower_limit(integerValue);
+          break;
+        case VARIABLE_NAME:
         case NEGATIVE_INFINITY:
         case POSITIVE_INFINITY:
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-          case DIGITS_INTEGER:
-            integerValue = getIntegerValue();
-                                  intervalInteger.setLower_limit(integerValue);
-            break;
-          case VARIABLE_NAME:
-          case NEGATIVE_INFINITY:
-          case POSITIVE_INFINITY:
-            handleEndpointsAndVariablesForInteger(intervalInteger, true);
-            break;
-          default:
-            jj_la1[50] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
-          }
-          jj_consume_token(SP);
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-          case DIGITS_INTEGER:
-            integerValue = getIntegerValue();
-                                 intervalInteger.setUpper_limit(integerValue);
-            break;
-          case VARIABLE_NAME:
-          case NEGATIVE_INFINITY:
-          case POSITIVE_INFINITY:
-            handleEndpointsAndVariablesForInteger(intervalInteger, false);
-            break;
-          default:
-            jj_la1[51] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
-          }
-          break;
-        case EMPTY_SET:
-          jj_consume_token(EMPTY_SET);
-                          intervalFloat.emptyInterval();
+          handleEndpointsAndVariablesForInteger(intervalInteger, true);
           break;
         default:
-          jj_la1[52] = jj_gen;
+          jj_la1[50] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+        jj_consume_token(SP);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case DIGITS_INTEGER:
+          integerValue = getIntegerValue();
+                                 intervalInteger.setUpper_limit(integerValue);
+          break;
+        case VARIABLE_NAME:
+        case NEGATIVE_INFINITY:
+        case POSITIVE_INFINITY:
+          handleEndpointsAndVariablesForInteger(intervalInteger, false);
+          break;
+        default:
+          jj_la1[51] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
         break;
+      case EMPTY_SET:
+        jj_consume_token(EMPTY_SET);
+                          intervalFloat.emptyInterval();
+        break;
       case ENTIRE_SET:
         jj_consume_token(ENTIRE_SET);
                           intervalFloat.setEntireInterval();
-        jj_consume_token(CLOSE_INTERVAL_VARS);
-                  {if (true) return intervalInteger;}
         break;
       default:
-        jj_la1[53] = jj_gen;
+        jj_la1[52] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
+      jj_consume_token(CLOSE_INTERVAL_VARS);
+                  {if (true) return intervalInteger;}
       break;
     case LONG:
       jj_consume_token(LONG);
@@ -2272,7 +2264,7 @@ public class DSLParser implements DSLParserConstants {
           handleEndpointsAndVariablesForInteger(intervalInteger, true);
           break;
         default:
-          jj_la1[54] = jj_gen;
+          jj_la1[53] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -2288,7 +2280,7 @@ public class DSLParser implements DSLParserConstants {
           handleEndpointsAndVariablesForInteger(intervalInteger, false);
           break;
         default:
-          jj_la1[55] = jj_gen;
+          jj_la1[54] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -2302,7 +2294,7 @@ public class DSLParser implements DSLParserConstants {
                           intervalFloat.setEntireInterval();
         break;
       default:
-        jj_la1[56] = jj_gen;
+        jj_la1[55] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -2310,7 +2302,7 @@ public class DSLParser implements DSLParserConstants {
                   {if (true) return intervalInteger;}
       break;
     default:
-      jj_la1[57] = jj_gen;
+      jj_la1[56] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -2345,7 +2337,7 @@ public class DSLParser implements DSLParserConstants {
       EndpointsValue = getInfinityValue();
       break;
     default:
-      jj_la1[58] = jj_gen;
+      jj_la1[57] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -2386,7 +2378,7 @@ public class DSLParser implements DSLParserConstants {
       EndpointsValue = getInfinityValue();
       break;
     default:
-      jj_la1[59] = jj_gen;
+      jj_la1[58] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -2408,7 +2400,7 @@ public class DSLParser implements DSLParserConstants {
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[60];
+  final private int[] jj_la1 = new int[59];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
@@ -2422,19 +2414,19 @@ public class DSLParser implements DSLParserConstants {
       jj_la1_init_4();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x40040,0x40040,0x0,0x0,0x0,0x0,0x0,0x40000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1e00,0x1e00,0x1e00,0x0,0x1b80000,0x1b80000,0x1b80000,0x40000000,0xc1b80000,0x0,0x80000000,0x2a400000,0x16400000,0x80040000,0x1bc0000,0x1b80000,0x1800000,0x380000,0x40000,0x16440000,0x16440000,0x16440000,0x2a440000,0x2a440000,0x2a440000,0x440000,0x440000,0x440000,0x440000,0x440000,0x440000,0x100000,0x440000,0x440000,0x440000,0x1b80000,0x40000,0x40000,};
+      jj_la1_0 = new int[] {0x40040,0x40040,0x0,0x0,0x0,0x0,0x0,0x40000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1e00,0x1e00,0x1e00,0x0,0x1b80000,0x1b80000,0x1b80000,0x40000000,0xc1b80000,0x0,0x80000000,0x2a400000,0x16400000,0x80040000,0x1bc0000,0x1b80000,0x1800000,0x380000,0x40000,0x16440000,0x16440000,0x16440000,0x2a440000,0x2a440000,0x2a440000,0x440000,0x440000,0x440000,0x440000,0x440000,0x440000,0x440000,0x440000,0x440000,0x1b80000,0x40000,0x40000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0xffe00000,0xffe00000,0x400,0x400,0x400,0x400,0x400,0x2,0x400,0x400,0x400,0x400,0x400,0x400,0x400,0x400,0x400,0x400,0x400,0xffe00000,0xfa00,0xf200,0x0,0x0,0x0,0x10100,0x0,0x0,0x2,0x0,0xf,0xc,0x1,0x0,0x0,0x1,0x0,0x0,0x0,0x0,0x2,0xc,0xc,0x3c,0xc,0xc,0x3c,0xc,0xc,0x3c,0xc,0xc,0x1c,0x20,0xc,0xc,0x3c,0x20,0xc,0xc,};
+      jj_la1_1 = new int[] {0xffe00000,0xffe00000,0x400,0x400,0x400,0x400,0x400,0x2,0x400,0x400,0x400,0x400,0x400,0x400,0x400,0x400,0x400,0x400,0x400,0xffe00000,0xfa00,0xf200,0x0,0x0,0x0,0x10100,0x0,0x0,0x2,0x0,0xf,0xc,0x1,0x0,0x0,0x1,0x0,0x0,0x0,0x0,0x2,0xc,0xc,0x3c,0xc,0xc,0x3c,0xc,0xc,0x3c,0xc,0xc,0x3c,0xc,0xc,0x3c,0x0,0xc,0xc,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0xffffffff,0xffffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xffffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_2 = new int[] {0xffffffff,0xffffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xffffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_3() {
-      jj_la1_3 = new int[] {0xffffffff,0xffffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xffffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_3 = new int[] {0xffffffff,0xffffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xffffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_4() {
-      jj_la1_4 = new int[] {0x3ffffff,0x3ffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x3ffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_4 = new int[] {0x3ffffff,0x3ffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x3ffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
 
   /** Constructor with InputStream. */
@@ -2448,7 +2440,7 @@ public class DSLParser implements DSLParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 60; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 59; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -2462,7 +2454,7 @@ public class DSLParser implements DSLParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 60; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 59; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -2472,7 +2464,7 @@ public class DSLParser implements DSLParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 60; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 59; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -2482,7 +2474,7 @@ public class DSLParser implements DSLParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 60; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 59; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -2491,7 +2483,7 @@ public class DSLParser implements DSLParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 60; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 59; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -2500,7 +2492,7 @@ public class DSLParser implements DSLParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 60; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 59; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -2556,7 +2548,7 @@ public class DSLParser implements DSLParserConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 60; i++) {
+    for (int i = 0; i < 59; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

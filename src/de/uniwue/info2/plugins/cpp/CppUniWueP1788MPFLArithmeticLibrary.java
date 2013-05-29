@@ -22,23 +22,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package de.uniwue.info2.generator.cases.cpp;
+package de.uniwue.info2.plugins.cpp;
 
-import static de.uniwue.info2.generator.cases.PlaceHolder.INTERVAL_NAME;
-import static de.uniwue.info2.generator.cases.PlaceHolder.INTERVAL_TYPE;
-import static de.uniwue.info2.generator.cases.PlaceHolder.LOWER_VALUE;
-import static de.uniwue.info2.generator.cases.PlaceHolder.NAME;
-import static de.uniwue.info2.generator.cases.PlaceHolder.PARAM_TYPE;
-import static de.uniwue.info2.generator.cases.PlaceHolder.TYPE;
-import static de.uniwue.info2.generator.cases.PlaceHolder.UPPER_VALUE;
-import static de.uniwue.info2.generator.cases.PlaceHolder.VAR_ARGS;
-import static de.uniwue.info2.generator.cases.PlaceHolder.inputName;
-import static de.uniwue.info2.generator.cases.PlaceHolder.outputName;
-import static de.uniwue.info2.generator.cases.PlaceHolder.outputType;
+import static de.uniwue.info2.generator.PlaceHolder.INTERVAL_NAME;
+import static de.uniwue.info2.generator.PlaceHolder.INTERVAL_TYPE;
+import static de.uniwue.info2.generator.PlaceHolder.LOWER_VALUE;
+import static de.uniwue.info2.generator.PlaceHolder.NAME;
+import static de.uniwue.info2.generator.PlaceHolder.PARAM_TYPE;
+import static de.uniwue.info2.generator.PlaceHolder.TYPE;
+import static de.uniwue.info2.generator.PlaceHolder.UPPER_VALUE;
+import static de.uniwue.info2.generator.PlaceHolder.VAR_ARGS;
+import static de.uniwue.info2.generator.PlaceHolder.inputName;
+import static de.uniwue.info2.generator.PlaceHolder.outputName;
+import static de.uniwue.info2.generator.PlaceHolder.outputType;
 
 import java.util.HashMap;
 
-import de.uniwue.info2.generator.cases.ArithmeticLibrarySpecification;
+import de.uniwue.info2.generator.ArithmeticLibrarySpecification;
 import de.uniwue.info2.numerics.prec.DoublePrecisionFloat;
 import de.uniwue.info2.numerics.prec.SinglePrecisionFloat;
 
@@ -84,7 +84,7 @@ public class CppUniWueP1788MPFLArithmeticLibrary extends ArithmeticLibrarySpecif
 		buffer.append("#include <limits>\n");
 		buffer.append("#include \"p1788/p1788.hpp\"\n");
 		buffer.append("template<typename T>\n");
-		buffer.append("using interval = " + mix_type_loc + "interval<T, " + FLAVOR + ">;\n");
+		buffer.append("using interval = " + mix_type_loc + "interval<T, " + FLAVOR + ">;");
 		return buffer.toString();
 	}
 
@@ -247,6 +247,11 @@ public class CppUniWueP1788MPFLArithmeticLibrary extends ArithmeticLibrarySpecif
 		} else if (!op.containsKey(name)) {
 			op.put(name, map.toString());
 		}
+	}
+
+	@Override
+	public String getCustomMethods() {
+		return "";
 	}
 
 }

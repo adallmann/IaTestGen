@@ -44,11 +44,11 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang.StringUtils;
 
+import de.uniwue.info2.generator.ArithmeticLibrarySpecification;
+import de.uniwue.info2.generator.LanguageFactory;
+import de.uniwue.info2.generator.LanguageSpecification;
 import de.uniwue.info2.generator.TestcaseGenerator;
-import de.uniwue.info2.generator.cases.ArithmeticLibrarySpecification;
-import de.uniwue.info2.generator.cases.LanguageFactory;
-import de.uniwue.info2.generator.cases.LanguageSpecification;
-import de.uniwue.info2.generator.cases.UnitTestLibrarySpecification;
+import de.uniwue.info2.generator.UnitTestLibrarySpecification;
 
 /**
  * Main class with Commandline-Interpreter.

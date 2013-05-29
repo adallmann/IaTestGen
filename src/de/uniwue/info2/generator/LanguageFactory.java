@@ -22,17 +22,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package de.uniwue.info2.generator.cases;
+package de.uniwue.info2.generator;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
-import de.uniwue.info2.generator.cases.cpp.CppBoostUnitTestLibrary;
-import de.uniwue.info2.generator.cases.cpp.CppSpecification;
-import de.uniwue.info2.generator.cases.cpp.CppUniWueP1788IEEE754ArithmeticLibrary;
-import de.uniwue.info2.generator.cases.cpp.CppUniWueP1788MPFLArithmeticLibrary;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
 
 /**
  * This class is used to instantiate LanguageSpecification, ArithmeticLibrarySpecification and UnitTestLibrarySpecification.
@@ -71,27 +70,42 @@ public class LanguageFactory {
 		return availableArithmeticLibraries_.get(language);
 	}
 
-	// TODO:
-	// create plugin structur with java reflection
-	// save plugin-folder location in LanguageSpecification-object
-	private List<Class<? extends LanguageSpecification>> listLanguageSpecificationPlugins(File plugin_folder) {
-		List<Class<? extends LanguageSpecification>> specs = new ArrayList<Class<? extends LanguageSpecification>>();
-		specs.add(CppSpecification.class);
+	private List<Class<? extends LanguageSpecification>> listLanguageSpecificationPlugins() {
+		Reflections reflections = new Reflections(ClasspathHelper.forPackage("de.uniwue.info2"), new SubTypesScanner());
+
+		Set<Class<? extends LanguageSpecification>> modules = reflections.getSubTypesOf(de.uniwue.info2.generator.LanguageSpecification.class);
+		List<Class<? extends LanguageSpecification>> specs = new ArrayList<Class<? extends LanguageSpecification>>(modules);
+
 		return specs;
 	}
 
-	// TODO:
-	private List<Class<? extends UnitTestLibrarySpecification>> listUnitTestLibrarySpecificationPlugins(File language_folder) {
+	private List<Class<? extends UnitTestLibrarySpecification>> listUnitTestLibrarySpecificationPlugins(Package lang_package) {
+		Reflections reflections = new Reflections(ClasspathHelper.forPackage("de.uniwue.info2"), new SubTypesScanner());
+
+		Set<Class<? extends UnitTestLibrarySpecification>> modules = reflections
+				.getSubTypesOf(de.uniwue.info2.generator.UnitTestLibrarySpecification.class);
 		List<Class<? extends UnitTestLibrarySpecification>> specs = new ArrayList<Class<? extends UnitTestLibrarySpecification>>();
-		specs.add(CppBoostUnitTestLibrary.class);
+		for (Class<? extends UnitTestLibrarySpecification> u : modules) {
+			if (u.getPackage().equals(lang_package)) {
+				specs.add(u);
+			}
+		}
+
 		return specs;
 	}
 
-	// TODO:
-	private List<Class<? extends ArithmeticLibrarySpecification>> listArithmeticLibrarySpecificationPlugins(File language_folder) {
+	private List<Class<? extends ArithmeticLibrarySpecification>> listArithmeticLibrarySpecificationPlugins(Package lang_package) {
+		Reflections reflections = new Reflections(ClasspathHelper.forPackage("de.uniwue.info2"), new SubTypesScanner());
+
+		Set<Class<? extends ArithmeticLibrarySpecification>> modules = reflections
+				.getSubTypesOf(de.uniwue.info2.generator.ArithmeticLibrarySpecification.class);
 		List<Class<? extends ArithmeticLibrarySpecification>> specs = new ArrayList<Class<? extends ArithmeticLibrarySpecification>>();
-		specs.add(CppUniWueP1788IEEE754ArithmeticLibrary.class);
-		specs.add(CppUniWueP1788MPFLArithmeticLibrary.class);
+		for (Class<? extends ArithmeticLibrarySpecification> a : modules) {
+			if (a.getPackage().equals(lang_package)) {
+				specs.add(a);
+			}
+		}
+
 		return specs;
 	}
 
@@ -104,9 +118,7 @@ public class LanguageFactory {
 		availableUnitTestLibraries_ = new HashMap<String, List<UnitTestLibrarySpecification>>();
 		availableArithmeticLibraries_ = new HashMap<String, List<ArithmeticLibrarySpecification>>();
 
-		// TODO:
-		List<Class<? extends LanguageSpecification>> lClasses = listLanguageSpecificationPlugins(null);
-
+		List<Class<? extends LanguageSpecification>> lClasses = listLanguageSpecificationPlugins();
 		for (Class<? extends LanguageSpecification> lClass : lClasses) {
 			try {
 				LanguageSpecification lSpec = lClass.newInstance();
@@ -119,8 +131,7 @@ public class LanguageFactory {
 				languageMap_.put(lKey, lSpec);
 				availableLanguageSpecifications_.add(lSpec);
 
-				// TODO: use folder of current language specification
-				List<Class<? extends UnitTestLibrarySpecification>> uClasses = listUnitTestLibrarySpecificationPlugins(null); 
+				List<Class<? extends UnitTestLibrarySpecification>> uClasses = listUnitTestLibrarySpecificationPlugins(lClass.getPackage());
 
 				for (Class<? extends UnitTestLibrarySpecification> uClass : uClasses) {
 					UnitTestLibrarySpecification uSpec = uClass.newInstance();
@@ -139,8 +150,7 @@ public class LanguageFactory {
 					}
 				}
 
-				// TODO:
-				List<Class<? extends ArithmeticLibrarySpecification>> aClasses = listArithmeticLibrarySpecificationPlugins(null); 
+				List<Class<? extends ArithmeticLibrarySpecification>> aClasses = listArithmeticLibrarySpecificationPlugins(lClass.getPackage());
 
 				for (Class<? extends ArithmeticLibrarySpecification> aClass : aClasses) {
 					ArithmeticLibrarySpecification aSpec = aClass.newInstance();

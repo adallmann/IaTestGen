@@ -24,32 +24,7 @@
  */
 package de.uniwue.info2.generator;
 
-import static de.uniwue.info2.generator.cases.PlaceHolder.ARITHMETIC_EVAL;
-import static de.uniwue.info2.generator.cases.PlaceHolder.ARITHMETIC_LIB_IMPORTS;
-import static de.uniwue.info2.generator.cases.PlaceHolder.TEST_LIB_IMPORTS;
-import static de.uniwue.info2.generator.cases.PlaceHolder.VAR_ARGS;
-import static de.uniwue.info2.generator.cases.PlaceHolder.ASSERTS;
-import static de.uniwue.info2.generator.cases.PlaceHolder.CALCULATED_OUTPUT;
-import static de.uniwue.info2.generator.cases.PlaceHolder.CUSTOM_METHODS;
-import static de.uniwue.info2.generator.cases.PlaceHolder.DYNAMIC_TEST_METHODS;
-import static de.uniwue.info2.generator.cases.PlaceHolder.EXPECTED_OUTPUT;
-import static de.uniwue.info2.generator.cases.PlaceHolder.HEAD_COMMENT;
-import static de.uniwue.info2.generator.cases.PlaceHolder.INTERVAL_NAME;
-import static de.uniwue.info2.generator.cases.PlaceHolder.INTERVAL_TYPE;
-import static de.uniwue.info2.generator.cases.PlaceHolder.LANGUAGE_IMPORTS;
-import static de.uniwue.info2.generator.cases.PlaceHolder.LOWER_VALUE;
-import static de.uniwue.info2.generator.cases.PlaceHolder.NAME;
-import static de.uniwue.info2.generator.cases.PlaceHolder.PARAM_TYPE;
-import static de.uniwue.info2.generator.cases.PlaceHolder.TEST_CASES;
-import static de.uniwue.info2.generator.cases.PlaceHolder.TEST_CASE_COMMENTS;
-import static de.uniwue.info2.generator.cases.PlaceHolder.TEST_CASE_NAME;
-import static de.uniwue.info2.generator.cases.PlaceHolder.TYPE;
-import static de.uniwue.info2.generator.cases.PlaceHolder.UPPER_VALUE;
-import static de.uniwue.info2.generator.cases.PlaceHolder.VALUE;
-import static de.uniwue.info2.generator.cases.PlaceHolder.getID;
-import static de.uniwue.info2.generator.cases.PlaceHolder.inputName;
-import static de.uniwue.info2.generator.cases.PlaceHolder.outputName;
-import static de.uniwue.info2.generator.cases.PlaceHolder.outputType;
+import static de.uniwue.info2.generator.PlaceHolder.*;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -68,9 +43,6 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
-import de.uniwue.info2.generator.cases.ArithmeticLibrarySpecification;
-import de.uniwue.info2.generator.cases.LanguageSpecification;
-import de.uniwue.info2.generator.cases.UnitTestLibrarySpecification;
 import de.uniwue.info2.numerics.FloatingPoint;
 import de.uniwue.info2.operations.Endpoints;
 import de.uniwue.info2.operations.GenericParameter;
@@ -177,11 +149,18 @@ public class TestcaseGenerator {
 		// float, boolean
 		// ...)
 		this.currentTypeTranslation_ = currentLanguageSpecification_.getTypesTranslation();
+		if (this.currentTypeTranslation_ == null)
+			this.currentTypeTranslation_ = new HashMap<Class<?>, String[]>();
+
 		// get boolean translation (true, false)
 		this.currentBooleanTranslation_ = currentLanguageSpecification_.getBooleanTranslation();
+		if (this.currentBooleanTranslation_ == null)
+			this.currentBooleanTranslation_ = new HashMap<Boolean, String>();
 
 		// get line comment definition
 		this.lineComment_ = this.currentLanguageSpecification_.getLineCommentToken();
+		if (this.lineComment_ == null)
+			this.lineComment_ = "/";
 
 		this.littleEndian_ = littleEndian;
 
@@ -194,21 +173,35 @@ public class TestcaseGenerator {
 			// then iterates through arithmetic libraries
 			for (ArithmeticLibrarySpecification aSpec : this.currentLanguageSpecification_.getArithmeticLibraryList()) {
 				log = new StringBuffer();
-
 				this.currentArithmeticLibrary_ = aSpec;
+
 				// get translations for negative and positive infinity-limits
 				this.currentPositiveInfinityTable_ = this.currentArithmeticLibrary_.getPositiveInfinityTranslation();
+				if (this.currentPositiveInfinityTable_ == null)
+					this.currentPositiveInfinityTable_ = new HashMap<Class<?>, String[]>();
 				this.currentNegativeInfinityTable_ = this.currentArithmeticLibrary_.getNegativeInfinityTranslation();
+				if (this.currentNegativeInfinityTable_ == null)
+					this.currentNegativeInfinityTable_ = new HashMap<Class<?>, String[]>();
 
 				// add interval translation from arithmetic library
 				this.currentTypeTranslation_.put(Interval.class, aSpec.getIntervalTranslation());
 				this.currentEmptyIntervalTranslation_ = aSpec.getEmptyIntervalTranslation();
+
+				if (this.currentEmptyIntervalTranslation_ == null)
+					this.currentEmptyIntervalTranslation_ = new String[0];
 				this.currentEntireIntervalTranslation_ = aSpec.getEntireIntervalTranslation();
+				if (this.currentEntireIntervalTranslation_ == null)
+					this.currentEntireIntervalTranslation_ = new String[0];
 
 				// add all operation-translations
 				this.currentOperationsTranslationTable_ = aSpec.getOperationsTranslation();
+				if (this.currentOperationsTranslationTable_ == null)
+					this.currentOperationsTranslationTable_ = new HashMap<String, String>();
 
 				this.currentMixedTypesOperationsTranslationTable_ = aSpec.getMixedTypesOperationsTranslation();
+				if (this.currentMixedTypesOperationsTranslationTable_ == null)
+					this.currentMixedTypesOperationsTranslationTable_ = new HashMap<String, String>();
+
 				// add operations to get lower and upper limit from intervall
 				this.currentOperationsTranslationTable_.put("intervalLowerLimit", aSpec.getIntervalLowerLimit());
 				this.currentOperationsTranslationTable_.put("intervalUpperLimit", aSpec.getIntervalUpperLimit());
@@ -217,28 +210,28 @@ public class TestcaseGenerator {
 				this.currentBuild_ = this.currentLanguageSpecification_.getCodeSequence();
 
 				// insert head comment with authors, version and description
-				this.currentBuild_ = replacePlaceHolder(this.currentBuild_, HEAD_COMMENT, this.getHeadComment());
+				this.currentBuild_ = replacePlaceHolder(this.currentBuild_, HEAD_COMMENT, this.getHeadComment() + "\n");
 
 				// inserts imports and definitions from current
 				// LanguageSpecification-subclass
 				this.currentBuild_ = replacePlaceHolder(this.currentBuild_, LANGUAGE_IMPORTS,
-						this.currentLanguageSpecification_.getImportsAndDefinitions());
+						this.currentLanguageSpecification_.getImportsAndDefinitions() + "\n");
 
 				// inserts imports and definitions from current
 				// ArithmeticLibrarySpecification-subclass
-				this.currentBuild_ = replacePlaceHolder(this.currentBuild_, ARITHMETIC_LIB_IMPORTS, aSpec.getImportsAndDefinitions());
+				this.currentBuild_ = replacePlaceHolder(this.currentBuild_, ARITHMETIC_LIB_IMPORTS, aSpec.getImportsAndDefinitions() + "\n");
 
 				// inserts imports and definitions from current
 				// ArithmeticLibrarySpecification-subclass
-				this.currentBuild_ = replacePlaceHolder(this.currentBuild_, TEST_LIB_IMPORTS, uSpec.getImportsAndDefinitions());
+				this.currentBuild_ = replacePlaceHolder(this.currentBuild_, TEST_LIB_IMPORTS, uSpec.getImportsAndDefinitions() + "\n\n");
 
 				// inserts custom methods from current
 				// LanguageSpecification-subclass
 				this.currentBuild_ = replacePlaceHolder(this.currentBuild_, CUSTOM_METHODS,
-						this.currentLanguageSpecification_.getLanguageCustomMethods());
+						this.currentLanguageSpecification_.getLanguageCustomMethods() + "\n\n");
 
 				// get program code-sequence of test-case-section
-				this.currentBuild_ = replacePlaceHolder(this.currentBuild_, TEST_CASES, uSpec.getCodeSequence());
+				this.currentBuild_ = replacePlaceHolder(this.currentBuild_, TEST_CASES, uSpec.getCodeSequence() + "\n\n");
 
 				// write all test methods into this string
 				String testMethods = "";
@@ -248,6 +241,7 @@ public class TestcaseGenerator {
 				while (operationIterator.hasNext()) {
 					Operation operation = operationIterator.next();
 
+					// private Class<?> currentMixedType;
 					// given mixed type
 					this.currentMixedType = operation.getMixedType();
 					boolean mixed_types = checkOperationForMixType(operation);
@@ -279,14 +273,11 @@ public class TestcaseGenerator {
 
 							// build test-case name from operations information
 							String testcaseName = TESTCASE + INDEX.format(currentTestNumber++);
-							String operationName = "_" + operation.getName().toLowerCase().replaceAll("[^a-z]", "");
+							String operationName = "_" + operation.getName().toLowerCase().replaceAll("[^a-z0-9]", "");
 							if (!operationName.equals("_")) {
 								testcaseName += operationName;
 							}
 
-							// insert one test method with current operation
-							// name
-							testMethods = replacePlaceHolder(testMethods, TEST_CASE_NAME, testcaseName);
 
 							// get input and output parameter of current
 							// operation
@@ -319,8 +310,7 @@ public class TestcaseGenerator {
 								String inputName = "";
 								if (input_parameter.size() < 2) {
 									inputName = "input";
-								}
-								else {
+								} else {
 									inputName = "input_" + INDEX.format(i + 1);
 								}
 
@@ -332,11 +322,9 @@ public class TestcaseGenerator {
 
 									if (interval.isEmpty()) {
 										declarations += getNewIntervalString(interval, inputName, true, false);
-									}
-									else if (interval.isEntire()) {
+									} else if (interval.isEntire()) {
 										declarations += getNewIntervalString(interval, inputName, false, true);
-									}
-									else {
+									} else {
 										declarations += getNewIntervalString(interval, inputName, false, false);
 									}
 
@@ -371,8 +359,7 @@ public class TestcaseGenerator {
 								if (output_parameter.size() < 2) {
 									expectedOutputName = "output";
 									outputName = "lib_output";
-								}
-								else {
+								} else {
 									expectedOutputName = "output_" + INDEX.format(i + 1);
 									outputName = "lib_output_" + INDEX.format(i + 1);
 								}
@@ -392,43 +379,44 @@ public class TestcaseGenerator {
 
 									if (interval.isEmpty()) {
 										declarations += getNewIntervalString(interval, expectedOutputName, true, false);
-									}
-									else if (interval.isEntire()) {
+									} else if (interval.isEntire()) {
 										declarations += getNewIntervalString(interval, expectedOutputName, false, true);
-									}
-									else {
+									} else {
 										declarations += getNewIntervalString(interval, expectedOutputName, false, false);
 									}
 
 									// get interval translation from current
 									// arithmetic-library-specification
 									String intervalType = this.currentTypeTranslation_.get(((Interval<?>) output.getValue()).getTypeClass())[0];
-									
+
 									if (interval.isEmpty()) {
 										assertString += getAssertFunctionForEmptyInterval(expectedOutputName, outputName, currentSetConfig, isNegated);
-									}
-									else if (interval.isEntire()) {
+									} else if (interval.isEntire()) {
 										assertString += getAssertFunctionForEntireInterval(expectedOutputName, outputName, currentSetConfig, isNegated);
-									}
-									else {
+									} else {
 										assertString += getAssertFunctionForInterval(intervalType, expectedOutputName, outputName, currentSetConfig, isNegated);
 									}
-
 								} else {
 									declarations += getParameterString(output, expectedOutputName);
 									type = this.currentTypeTranslation_.get(output.getTypeClass())[0];
-									assertString += "\n" + getAssertString(expectedOutputName, outputName, null, isNegated) + "\n";
+									assertString += "\n" + getAssertString(expectedOutputName, outputName, null, isNegated);
 								}
 								function = function.replace(outputName(i + 1), outputName);
 								String[] intervalTranslation = this.currentTypeTranslation_.get(output.getTypeClass());
 								function = function.replace(outputType(i + 1), intervalTranslation[0].replace(INTERVAL_TYPE, type));
 							}
+
+							// insert one test method with current operation
+							// name
+							testMethods = replacePlaceHolder(testMethods, TEST_CASE_NAME, testcaseName);
+
 							// add comment to current operation function
 							declarations += "\n" + this.lineComment_ + " operation to test: " + operation.getName();
 							declarations += "\n" + function;
 							testMethods = replacePlaceHolder(testMethods, ARITHMETIC_EVAL, declarations);
-							testMethods = replacePlaceHolder(testMethods, ASSERTS, assertString);
+							testMethods = replacePlaceHolder(testMethods, ASSERTS, assertString + "\n");
 							testMethods += "\n\n";
+
 						}
 					} else {
 						String error = "";
@@ -442,14 +430,47 @@ public class TestcaseGenerator {
 					}
 				}
 
+				// insert custom methods from ia-library
+				String arithCustomMethods = this.currentArithmeticLibrary_.getCustomMethods();
+				if (arithCustomMethods != null) {
+					arithCustomMethods = this.lineComment_ + " Custom methods of IA-Library;\n" + arithCustomMethods + "\n";
+					this.currentBuild_ = replacePlaceHolder(currentBuild_, ARITHMETIC_CUSTOM_METHODS, arithCustomMethods);
+				}
+
 				// insert generated testcase-functions
 				this.currentBuild_ = replacePlaceHolder(currentBuild_, DYNAMIC_TEST_METHODS, testMethods);
 
-				// build filename for current language specification
-				String outputFileName = (this.currentLanguageSpecification_.getOptionName() + "_" + this.currentUnitTestLibrary_.getOptionName())
-						.toLowerCase().replace("^[a-z0-9_]", "_") + "_" + this.currentArithmeticLibrary_.getOptionName()
+				// set up file name
+				String namePlaceholders = this.currentLanguageSpecification_.getOutputFileName();
 
-				+ "." + this.currentLanguageSpecification_.getExtension();
+				String outputFileName = "";
+				String replaceIllegalChras = "[^0-9a-zA-Z]+";
+				String langExt = this.currentLanguageSpecification_.getExtension();
+				String langName = this.currentLanguageSpecification_.getOptionName().replaceAll(replaceIllegalChras, "");
+				langName = Character.toUpperCase(langName.charAt(0)) + langName.substring(1);
+				String unitName = this.currentUnitTestLibrary_.getOptionName().replaceAll(replaceIllegalChras, "");
+				unitName = Character.toUpperCase(unitName.charAt(0)) + unitName.substring(1);
+				String arithName = this.currentArithmeticLibrary_.getOptionName().replaceAll(replaceIllegalChras, "");
+				arithName = Character.toUpperCase(arithName.charAt(0)) + arithName.substring(1);
+
+				if (namePlaceholders != null) {
+					if (!namePlaceholders.trim().isEmpty()) {
+						namePlaceholders = replacePlaceHolder(namePlaceholders, LANGUAGE_SPEC_NAME, langName);
+						namePlaceholders = replacePlaceHolder(namePlaceholders, ARITHMETIC_SPEC_NAME, arithName);
+						namePlaceholders = replacePlaceHolder(namePlaceholders, UNITTEST_SPEC_NAME, unitName);
+						outputFileName = namePlaceholders + "." + langExt;
+					}
+				}
+
+				// build filename for current language specification
+				if (outputFileName.isEmpty()) {
+					outputFileName = (langName + "_" + unitName + "_" + arithName).toLowerCase().replaceAll(replaceIllegalChras, "_") + "." + langExt;
+				}
+
+				this.currentBuild_ = replacePlaceHolder(this.currentBuild_, LANGUAGE_SPEC_NAME, langName);
+				this.currentBuild_ = replacePlaceHolder(this.currentBuild_, ARITHMETIC_SPEC_NAME, arithName);
+				this.currentBuild_ = replacePlaceHolder(this.currentBuild_, UNITTEST_SPEC_NAME, unitName);
+
 				File outputFile = new File(this.outputFolder_, outputFileName);
 
 				try {
@@ -653,17 +674,23 @@ public class TestcaseGenerator {
 	 * @return assert-function as string
 	 */
 	private String getAssertFunctionForEmptyInterval(String expectedOutputName, String outputName, Set set, boolean negate) {
+
 		String bool_expected = "bool_" + expectedOutputName;
 		String bool_output = "bool_" + outputName;
 		String type = this.currentTypeTranslation_.get(Boolean.class)[0];
+		String translation = currentOperationsTranslationTable_.get("is_empty");
 
-		String first_lower_limit_def = currentOperationsTranslationTable_.get("is_empty").replace(outputType(1), type)
-				.replace(outputName(1), bool_expected).replace(inputName(1), expectedOutputName);
-		String second_lower_limit_def = currentOperationsTranslationTable_.get("is_empty").replace(outputType(1), type)
-				.replace(outputName(1), bool_output).replace(inputName(1), outputName);
-		String lower_limit_test = getAssertString(bool_expected, bool_output, set, negate);
+		if (translation != null) {
+			String first_lower_limit_def = currentOperationsTranslationTable_.get("is_empty").replace(outputType(1), type)
+					.replace(outputName(1), bool_expected).replace(inputName(1), expectedOutputName);
+			String second_lower_limit_def = currentOperationsTranslationTable_.get("is_empty").replace(outputType(1), type)
+					.replace(outputName(1), bool_output).replace(inputName(1), outputName);
+			String lower_limit_test = getAssertString(bool_expected, bool_output, set, negate);
 
-		return ("\n" + first_lower_limit_def + "\n" + second_lower_limit_def + "\n" + lower_limit_test + "\n");
+			return ("\n" + first_lower_limit_def + "\n" + second_lower_limit_def + "\n" + lower_limit_test + "\n");
+		} else {
+			return "\n" + this.lineComment_ + " ERROR: is_empty-method not implemented\n";
+		}
 	}
 
 	/**
@@ -676,17 +703,24 @@ public class TestcaseGenerator {
 	 * @return assert-function as string
 	 */
 	private String getAssertFunctionForEntireInterval(String expectedOutputName, String outputName, Set set, boolean negate) {
+
 		String bool_expected = "bool_" + expectedOutputName;
 		String bool_output = "bool_" + outputName;
 		String type = this.currentTypeTranslation_.get(Boolean.class)[0];
+		String translation = currentOperationsTranslationTable_.get("is_entire");
 
-		String first_lower_limit_def = currentOperationsTranslationTable_.get("is_entire").replace(outputType(1), type)
-				.replace(outputName(1), bool_expected).replace(inputName(1), expectedOutputName);
-		String second_lower_limit_def = currentOperationsTranslationTable_.get("is_entire").replace(outputType(1), type)
-				.replace(outputName(1), bool_output).replace(inputName(1), outputName);
-		String lower_limit_test = getAssertString(bool_expected, bool_output, set, negate);
+		if (translation != null) {
+			String first_lower_limit_def = currentOperationsTranslationTable_.get("is_entire").replace(outputType(1), type)
+					.replace(outputName(1), bool_expected).replace(inputName(1), expectedOutputName);
+			String second_lower_limit_def = currentOperationsTranslationTable_.get("is_entire").replace(outputType(1), type)
+					.replace(outputName(1), bool_output).replace(inputName(1), outputName);
+			String lower_limit_test = getAssertString(bool_expected, bool_output, set, negate);
 
-		return ("\n" + first_lower_limit_def + "\n" + second_lower_limit_def + "\n" + lower_limit_test + "\n");
+			return ("\n" + first_lower_limit_def + "\n" + second_lower_limit_def + "\n" + lower_limit_test + "\n");
+		} else {
+			return "\n" + this.lineComment_ + " ERROR: is_entire-method not implemented\n";
+		}
+
 	}
 
 	/**
@@ -791,17 +825,24 @@ public class TestcaseGenerator {
 		String inputType = currentTypeTranslation_.get(interval.getTypeClass())[0];
 
 		if (empty) {
-			declaration += currentEmptyIntervalTranslation_[1];
-			declaration = declaration.replace(PARAM_TYPE, currentEmptyIntervalTranslation_[0]);
-			declaration = declaration.replace(INTERVAL_TYPE, inputType);
-			declaration = declaration.replace(INTERVAL_NAME, name) + "\n";
+			if (currentEmptyIntervalTranslation_.length == 2) {
+				declaration += currentEmptyIntervalTranslation_[1];
+				declaration = declaration.replace(PARAM_TYPE, currentEmptyIntervalTranslation_[0]);
+				declaration = declaration.replace(INTERVAL_TYPE, inputType);
+				declaration = declaration.replace(INTERVAL_NAME, name) + "\n";
+			} else {
+				declaration += this.lineComment_ + " ERROR: empty intervals are not implemented!\n";
+			}
 			return declaration;
-		}
-		else if(entire) {
-			declaration += currentEntireIntervalTranslation_[1];
-			declaration = declaration.replace(PARAM_TYPE, currentEntireIntervalTranslation_[0]);
-			declaration = declaration.replace(INTERVAL_TYPE, inputType);
-			declaration = declaration.replace(INTERVAL_NAME, name) + "\n";
+		} else if (entire) {
+			if (currentEntireIntervalTranslation_.length == 2) {
+				declaration += currentEntireIntervalTranslation_[1];
+				declaration = declaration.replace(PARAM_TYPE, currentEntireIntervalTranslation_[0]);
+				declaration = declaration.replace(INTERVAL_TYPE, inputType);
+				declaration = declaration.replace(INTERVAL_NAME, name) + "\n";
+			} else {
+				declaration += this.lineComment_ + " ERROR: entire intervals are not implemented!\n";
+			}
 			return declaration;
 		}
 
@@ -869,6 +910,9 @@ public class TestcaseGenerator {
 					space = StringUtils.repeat(" ", Short.valueOf(spaceVar));
 				}
 				insert = space + insert.replace("\n", "\n" + space);
+				if (insert.endsWith(space)) {
+					insert = insert.substring(0, insert.length() - space.length());
+				}
 			}
 			original = original.replace(var, insert);
 		}

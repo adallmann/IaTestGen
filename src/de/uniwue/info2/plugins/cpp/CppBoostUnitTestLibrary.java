@@ -22,18 +22,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package de.uniwue.info2.generator.cases.cpp;
+package de.uniwue.info2.plugins.cpp;
 
-import de.uniwue.info2.generator.cases.UnitTestLibrarySpecification;
+import de.uniwue.info2.generator.UnitTestLibrarySpecification;
 import de.uniwue.info2.operations.Set;
 
-import static de.uniwue.info2.generator.cases.PlaceHolder.*;
+import static de.uniwue.info2.generator.PlaceHolder.*;
 
 /**
  * Translation basic structures of cpp programming language.
- * 
- * @author Michael Jedich
- * 
  */
 public class CppBoostUnitTestLibrary extends UnitTestLibrarySpecification {
 	private static final String OPTION_NAME = "boost";
@@ -83,9 +80,9 @@ public class CppBoostUnitTestLibrary extends UnitTestLibrarySpecification {
 		buffer.append(TEST_CASE_NAME);
 		buffer.append(")" + "\n" + "{" + "\n");
 		// adds input and output-parameter and the operation to test
-		buffer.append(addIndentationTabs(ARITHMETIC_EVAL, 1) + "\n");
+		buffer.append(addIndentationTabs(ARITHMETIC_EVAL, 1));
 		// adds assert-function from the unit-test-library
-		buffer.append(addIndentationTabs(ASSERTS, 1) + "\n");
+		buffer.append(addIndentationTabs(ASSERTS, 1));
 		buffer.append("}");
 		return buffer.toString();
 	}

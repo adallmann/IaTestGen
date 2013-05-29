@@ -1,3 +1,4 @@
+package de.uniwue.info2.plugins.cpp;
 /*
  *    IaTestGen - Interval arithmetic test generator
  *    Copyright 2013
