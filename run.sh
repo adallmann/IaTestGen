@@ -25,11 +25,13 @@
 #  
 
 
-
+##################################################################
+# README:
 ##################################################################
 # this script is meant for debugging
+# ( runnable jar-file is in build/current/ia_gen.jar )
 #
-# with it you can:
+# with this script you can:
 #   -compile the unit-test-generator programm
 #   -generate tests for available specifications
 #   -compile generated tests
@@ -51,11 +53,11 @@
 # show infopage of IaTestGen
 SHOW_HELP=false
 ##################################################################
-COMPILE_IATESTGEN=true
+COMPILE_IATESTGEN=false
 # recompile dsl-parser. set if DSLParser.jj modified.
 COMPILE_WITH_JAVACC=false
 # generate tests-source for all available specifications
-GENERATE_TESTS=false
+GENERATE_TESTS=true
 #######################LANGUAGE SPECS#############################
 JAVA_PRECISION_DEFAULT=true # JINTERVAL
 JAVA_PRECISION_EXACT=true
