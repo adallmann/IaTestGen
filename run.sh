@@ -25,19 +25,26 @@
 #  
 
 
-
+##################################################################
+# README:
 ##################################################################
 # this script is meant for debugging
+# ( runnable jar-file is in build/current/ia_gen.jar )
 #
-# with it you can:
+# with this script you can:
 #   -compile the unit-test-generator programm
 #   -generate tests for available specifications
 #   -compile generated tests
 #   -run generated tests
 # 
 # besides an installed jdk no further packages are needed
-# if you want to compile and run jinterval-tests with this
-# script place in lib-folder ("JInterval_all_include.jar")
+# 
+# if you want to compile jinterval-tests with this
+# script place jinterval in lib-folder 
+# ("JInterval_all_include.jar")
+#
+# if you want to run jinterval-tests with this
+# script place junit4 in lib-folder ("junit-4.0.jar")
 ##################################################################
 
 

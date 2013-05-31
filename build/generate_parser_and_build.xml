@@ -25,7 +25,7 @@
         <jar destfile="current/ia_gen.jar">
             <manifest>
                 <attribute name="Main-Class" value="de.uniwue.info2.main.CommandLineInterpreter"/>
-                <attribute name="Class-Path" value=". lib/JInterval_all_include.jar lib/reflections-0.9.9-RC1-uberjar.jar lib/javassist.jar lib/guava-14.0.1.jar lib/commons-cli-1.2.jar lib/commons-lang-2.5.jar"/>
+                <attribute name="Class-Path" value=". lib/reflections-0.9.9-RC1-uberjar.jar lib/javassist.jar lib/guava-14.0.1.jar lib/commons-cli-1.2.jar lib/commons-lang-2.5.jar"/>
             </manifest>
             <fileset dir="../bin"/>
         </jar>
