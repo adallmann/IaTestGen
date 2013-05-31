@@ -36,8 +36,13 @@
 #   -run generated tests
 # 
 # besides an installed jdk no further packages are needed
-# if you want to compile and run jinterval-tests with this
-# script place in lib-folder ("JInterval_all_include.jar")
+# 
+# if you want to compile jinterval-tests with this
+# script place jinterval in lib-folder 
+# ("JInterval_all_include.jar")
+#
+# if you want to run jinterval-tests with this
+# script place junit4 in lib-folder ("junit-4.0.jar")
 ##################################################################
 
 
@@ -46,11 +51,11 @@
 # show infopage of IaTestGen
 SHOW_HELP=false
 ##################################################################
-COMPILE_IATESTGEN=false
+COMPILE_IATESTGEN=true
 # recompile dsl-parser. set if DSLParser.jj modified.
 COMPILE_WITH_JAVACC=false
 # generate tests-source for all available specifications
-GENERATE_TESTS=true
+GENERATE_TESTS=false
 #######################LANGUAGE SPECS#############################
 JAVA_PRECISION_DEFAULT=true # JINTERVAL
 JAVA_PRECISION_EXACT=true
